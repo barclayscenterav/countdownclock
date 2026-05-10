@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>Countdown Admin</title>
 
 <style>
 
 body{
+  margin:0;
   font-family:Arial,sans-serif;
   background:#0f172a;
   color:white;
@@ -15,13 +18,12 @@ body{
   justify-content:center;
   align-items:center;
   min-height:100vh;
-  margin:0;
   padding:20px;
 }
 
 .container{
   width:100%;
-  max-width:500px;
+  max-width:600px;
   background:#1e293b;
   padding:40px;
   border-radius:20px;
@@ -29,8 +31,8 @@ body{
 }
 
 h1{
-  margin-bottom:30px;
   text-align:center;
+  margin-bottom:30px;
 }
 
 label{
@@ -58,23 +60,27 @@ button{
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
-  transition:0.2s;
 }
 
 button:hover{
-  opacity:0.9;
+  background:#2563eb;
 }
 
-.reset-btn{
+#result{
+  margin-top:30px;
+  display:none;
+}
+
+#shareUrl{
+  width:100%;
   margin-top:15px;
-  background:#ef4444;
+  background:#0f172a;
+  color:#4ade80;
 }
 
-.success{
-  margin-top:20px;
-  color:#4ade80;
-  text-align:center;
-  font-size:16px;
+.copy-btn{
+  margin-top:15px;
+  background:#10b981;
 }
 
 </style>
@@ -84,114 +90,109 @@ button:hover{
 
 <div class="container">
 
-  <h1>Countdown Admin</h1>
+  <h1>Create Countdown</h1>
 
   <label>Countdown Title</label>
+
   <input
     type="text"
     id="title"
-    placeholder="Example: Vacation Countdown"
+    placeholder="Example: Launch Event"
   >
 
   <label>End Date & Time</label>
+
   <input
     type="datetime-local"
     id="endTime"
   >
 
-  <button onclick="saveCountdown()">
-    Save Countdown
+  <button onclick="generateUrl()">
+    Generate Shareable URL
   </button>
 
-  <button
-    class="reset-btn"
-    onclick="resetCountdown()"
-  >
-    Reset Countdown
-  </button>
+  <div id="result">
 
-  <div class="success" id="successMessage"></div>
+    <label>Shareable Countdown URL</label>
+
+    <input
+      type="text"
+      id="shareUrl"
+      readonly
+    >
+
+    <button
+      class="copy-btn"
+      onclick="copyUrl()"
+    >
+      Copy URL
+    </button>
+
+  </div>
 
 </div>
 
 <script>
 
-function saveCountdown(){
+function generateUrl(){
 
   const title =
-    document.getElementById("title").value;
+    document.getElementById(
+      "title"
+    ).value.trim();
 
   const endTime =
-    document.getElementById("endTime").value;
+    document.getElementById(
+      "endTime"
+    ).value;
 
   if(!title || !endTime){
-    alert("Please fill out all fields.");
+
+    alert(
+      "Please fill out all fields."
+    );
+
     return;
   }
 
-  localStorage.setItem(
-    "countdownTitle",
-    title
-  );
+  const encodedTitle =
+    encodeURIComponent(title);
 
-  localStorage.setItem(
-    "countdownEndTime",
-    endTime
-  );
+  const encodedEndTime =
+    encodeURIComponent(endTime);
+
+  const baseUrl =
+    window.location.origin +
+    window.location.pathname
+      .replace(
+        "admin.html",
+        "index.html"
+      );
+
+  const finalUrl =
+    `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}`;
 
   document.getElementById(
-    "successMessage"
-  ).innerText =
-    "Countdown saved successfully!";
+    "shareUrl"
+  ).value = finalUrl;
+
+  document.getElementById(
+    "result"
+  ).style.display = "block";
 }
 
-function resetCountdown(){
+function copyUrl(){
 
-  localStorage.removeItem(
-    "countdownTitle"
-  );
-
-  localStorage.removeItem(
-    "countdownEndTime"
-  );
-
-  document.getElementById(
-    "title"
-  ).value = "";
-
-  document.getElementById(
-    "endTime"
-  ).value = "";
-
-  document.getElementById(
-    "successMessage"
-  ).innerText =
-    "Countdown reset successfully!";
-}
-
-window.onload = function(){
-
-  const savedTitle =
-    localStorage.getItem(
-      "countdownTitle"
+  const urlField =
+    document.getElementById(
+      "shareUrl"
     );
 
-  const savedEndTime =
-    localStorage.getItem(
-      "countdownEndTime"
-    );
+  urlField.select();
 
-  if(savedTitle){
-    document.getElementById(
-      "title"
-    ).value = savedTitle;
-  }
+  document.execCommand("copy");
 
-  if(savedEndTime){
-    document.getElementById(
-      "endTime"
-    ).value = savedEndTime;
-  }
+  alert("URL copied!");
 }
 
 </script>
