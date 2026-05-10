@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Countdown</title>
 
 <style>
@@ -12,23 +10,13 @@ content="width=device-width, initial-scale=1.0">
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:
-    linear-gradient(
-      135deg,
-      #0f172a,
-      #1e293b
-    );
-
+  background:linear-gradient(135deg,#0f172a,#1e293b);
   color:white;
-
   display:flex;
   justify-content:center;
   align-items:center;
-
   min-height:100vh;
-
   text-align:center;
-
   padding:20px;
 }
 
@@ -44,22 +32,13 @@ h1{
 
 .countdown{
   display:grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(180px,1fr)
-    );
-
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:20px;
 }
 
 .box{
-  background:
-    rgba(255,255,255,0.1);
-
+  background:rgba(255,255,255,0.1);
   padding:40px 20px;
-
   border-radius:20px;
 }
 
@@ -70,30 +49,24 @@ h1{
 
 .label{
   margin-top:10px;
-
   color:#cbd5e1;
-
   text-transform:uppercase;
+  font-size:1rem;
 }
 
 #endTimeDisplay{
   margin-top:30px;
-
   color:#cbd5e1;
-
   font-size:1.2rem;
 }
 
 #message{
   margin-top:30px;
-
   font-size:2rem;
-
   color:#4ade80;
 }
 
 @media(max-width:600px){
-
   h1{
     font-size:2rem;
   }
@@ -101,7 +74,6 @@ h1{
   .number{
     font-size:3rem;
   }
-
 }
 
 </style>
@@ -111,184 +83,99 @@ h1{
 
 <div class="container">
 
-  <h1 id="title">
-    Countdown
-  </h1>
+  <h1 id="title">Countdown</h1>
 
   <div class="countdown">
 
     <div class="box">
-
-      <div
-        class="number"
-        id="hours"
-      >
-        00
-      </div>
-
-      <div class="label">
-        Hours
-      </div>
-
+      <div class="number" id="hours">00</div>
+      <div class="label" id="hoursLabel">Hours</div>
     </div>
 
     <div class="box">
-
-      <div
-        class="number"
-        id="minutes"
-      >
-        00
-      </div>
-
-      <div class="label">
-        Minutes
-      </div>
-
+      <div class="number" id="minutes">00</div>
+      <div class="label" id="minutesLabel">Minutes</div>
     </div>
 
     <div class="box">
-
-      <div
-        class="number"
-        id="seconds"
-      >
-        00
-      </div>
-
-      <div class="label">
-        Seconds
-      </div>
-
+      <div class="number" id="seconds">00</div>
+      <div class="label" id="secondsLabel">Seconds</div>
     </div>
 
   </div>
 
   <div id="endTimeDisplay"></div>
-
   <div id="message"></div>
 
 </div>
 
 <script>
 
-const params =
-  new URLSearchParams(
-    window.location.search
-  );
+const params = new URLSearchParams(window.location.search);
 
-const title =
-  params.get("title");
-
-const end =
-  params.get("end");
+const title = params.get("title");
+const end = params.get("end");
 
 if(!title || !end){
 
-  document.getElementById(
-    "message"
-  ).innerText =
+  document.getElementById("message").innerText =
     "Invalid countdown link.";
 
 } else {
 
-  document.getElementById(
-    "title"
-  ).innerText = title;
+  document.getElementById("title").innerText = title;
 
-  const targetDate =
-    new Date(end).getTime();
+  const targetDate = new Date(end).getTime();
 
-  const formattedDate =
-    new Date(end)
-      .toLocaleString();
-
-  document.getElementById(
-    "endTimeDisplay"
-  ).innerText =
-    "Ends on: " +
-    formattedDate;
+  document.getElementById("endTimeDisplay").innerText =
+    "Ends on: " + new Date(end).toLocaleString();
 
   function updateCountdown(){
 
-    const now =
-      new Date().getTime();
-
-    const distance =
-      targetDate - now;
+    const now = new Date().getTime();
+    const distance = targetDate - now;
 
     if(distance <= 0){
 
       clearInterval(timer);
 
-      document.getElementById(
-        "hours"
-      ).innerText = "00";
+      document.getElementById("hours").innerText = "00";
+      document.getElementById("minutes").innerText = "00";
+      document.getElementById("seconds").innerText = "00";
 
-      document.getElementById(
-        "minutes"
-      ).innerText = "00";
-
-      document.getElementById(
-        "seconds"
-      ).innerText = "00";
-
-      document.getElementById(
-        "message"
-      ).innerText =
+      document.getElementById("message").innerText =
         "Countdown Complete!";
 
       return;
     }
 
-    const totalHours =
-      Math.floor(
-        distance /
-        (1000*60*60)
-      );
+    const totalHours = Math.floor(distance / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    const minutes =
-      Math.floor(
-        (distance %
-        (1000*60*60))
-        /
-        (1000*60)
-      );
+    document.getElementById("hours").innerText =
+      String(totalHours).padStart(2, "0");
 
-    const seconds =
-      Math.floor(
-        (distance %
-        (1000*60))
-        /
-        1000
-      );
+    document.getElementById("minutes").innerText =
+      String(minutes).padStart(2, "0");
 
-    document.getElementById(
-      "hours"
-    ).innerText =
-      String(totalHours)
-        .padStart(2,"0");
+    document.getElementById("seconds").innerText =
+      String(seconds).padStart(2, "0");
 
-    document.getElementById(
-      "minutes"
-    ).innerText =
-      String(minutes)
-        .padStart(2,"0");
+    // Singular / plural labels
+    document.getElementById("hoursLabel").innerText =
+      totalHours === 1 ? "Hour" : "Hours";
 
-    document.getElementById(
-      "seconds"
-    ).innerText =
-      String(seconds)
-        .padStart(2,"0");
+    document.getElementById("minutesLabel").innerText =
+      minutes === 1 ? "Minute" : "Minutes";
+
+    document.getElementById("secondsLabel").innerText =
+      seconds === 1 ? "Second" : "Seconds";
   }
 
   updateCountdown();
 
-  const timer =
-    setInterval(
-      updateCountdown,
-      1000
-    );
+  const timer = setInterval(updateCountdown, 1000);
 }
 
 </script>
