@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>Countdown</title>
 
 <style>
@@ -10,13 +12,23 @@
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#0f172a,#1e293b);
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #1e293b
+    );
+
   color:white;
+
   display:flex;
   justify-content:center;
   align-items:center;
+
   min-height:100vh;
+
   text-align:center;
+
   padding:20px;
 }
 
@@ -32,14 +44,22 @@ h1{
 
 .countdown{
   display:grid;
+
   grid-template-columns:
-    repeat(auto-fit,minmax(180px,1fr));
+    repeat(
+      auto-fit,
+      minmax(180px,1fr)
+    );
+
   gap:20px;
 }
 
 .box{
-  background:rgba(255,255,255,0.1);
+  background:
+    rgba(255,255,255,0.1);
+
   padding:40px 20px;
+
   border-radius:20px;
 }
 
@@ -50,20 +70,25 @@ h1{
 
 .label{
   margin-top:10px;
+
   color:#cbd5e1;
+
   text-transform:uppercase;
-  font-size:1rem;
 }
 
 #endTimeDisplay{
   margin-top:30px;
+
   color:#cbd5e1;
+
   font-size:1.2rem;
 }
 
 #message{
   margin-top:30px;
+
   font-size:2rem;
+
   color:#4ade80;
 }
 
@@ -93,18 +118,48 @@ h1{
   <div class="countdown">
 
     <div class="box">
-      <div class="number" id="hours">00</div>
-      <div class="label">Hours</div>
+
+      <div
+        class="number"
+        id="hours"
+      >
+        00
+      </div>
+
+      <div class="label">
+        Hours
+      </div>
+
     </div>
 
     <div class="box">
-      <div class="number" id="minutes">00</div>
-      <div class="label">Minutes</div>
+
+      <div
+        class="number"
+        id="minutes"
+      >
+        00
+      </div>
+
+      <div class="label">
+        Minutes
+      </div>
+
     </div>
 
     <div class="box">
-      <div class="number" id="seconds">00</div>
-      <div class="label">Seconds</div>
+
+      <div
+        class="number"
+        id="seconds"
+      >
+        00
+      </div>
+
+      <div class="label">
+        Seconds
+      </div>
+
     </div>
 
   </div>
@@ -117,40 +172,42 @@ h1{
 
 <script>
 
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
 const title =
-  localStorage.getItem(
-    "countdownTitle"
-  );
+  params.get("title");
 
-const endTime =
-  localStorage.getItem(
-    "countdownEndTime"
-  );
+const end =
+  params.get("end");
 
-document.getElementById(
-  "title"
-).innerText =
-  title || "Countdown";
-
-if(!endTime){
+if(!title || !end){
 
   document.getElementById(
     "message"
   ).innerText =
-    "No countdown has been set.";
+    "Invalid countdown link.";
 
 } else {
 
+  document.getElementById(
+    "title"
+  ).innerText = title;
+
   const targetDate =
-    new Date(endTime).getTime();
+    new Date(end).getTime();
 
   const formattedDate =
-    new Date(endTime).toLocaleString();
+    new Date(end)
+      .toLocaleString();
 
   document.getElementById(
     "endTimeDisplay"
   ).innerText =
-    "Ends on: " + formattedDate;
+    "Ends on: " +
+    formattedDate;
 
   function updateCountdown(){
 
@@ -209,17 +266,20 @@ if(!endTime){
     document.getElementById(
       "hours"
     ).innerText =
-      String(totalHours).padStart(2,"0");
+      String(totalHours)
+        .padStart(2,"0");
 
     document.getElementById(
       "minutes"
     ).innerText =
-      String(minutes).padStart(2,"0");
+      String(minutes)
+        .padStart(2,"0");
 
     document.getElementById(
       "seconds"
     ).innerText =
-      String(seconds).padStart(2,"0");
+      String(seconds)
+        .padStart(2,"0");
   }
 
   updateCountdown();
