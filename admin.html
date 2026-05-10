@@ -161,13 +161,15 @@ function generateUrl(){
   const encodedEndTime =
     encodeURIComponent(endTime);
 
+  // FORCE index.html
   const baseUrl =
     window.location.origin +
     window.location.pathname
-      .replace(
-        "admin.html",
-        "index.html"
-      );
+      .substring(
+        0,
+        window.location.pathname.lastIndexOf("/")
+      ) +
+    "/index.html";
 
   const finalUrl =
     `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}`;
@@ -180,7 +182,7 @@ function generateUrl(){
     "result"
   ).style.display = "block";
 }
-
+  
 function copyUrl(){
 
   const urlField =
