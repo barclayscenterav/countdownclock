@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown Admin</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#0f172a;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  margin:0;
+}
+
+.container{
+  width:100%;
+  max-width:500px;
+  background:#1e293b;
+  padding:40px;
+  border-radius:20px;
+}
+
+h1{
+  margin-bottom:30px;
+  text-align:center;
+}
+
+label{
+  display:block;
+  margin-bottom:10px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:25px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#2563eb;
+}
+
+.success{
+  margin-top:20px;
+  color:#4ade80;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Countdown Admin</h1>
+
+  <label>Countdown Title</label>
+  <input type="text" id="title" placeholder="Example: Vacation Countdown">
+
+  <label>End Date & Time</label>
+  <input type="datetime-local" id="endTime">
+
+  <button onclick="saveCountdown()">
+    Save Countdown
+  </button>
+
+  <div class="success" id="successMessage"></div>
+
+</div>
+
+<script>
+
+function saveCountdown(){
+
+  const title =
+    document.getElementById("title").value;
+
+  const endTime =
+    document.getElementById("endTime").value;
+
+  if(!title || !endTime){
+    alert("Please fill out all fields.");
+    return;
+  }
+
+  localStorage.setItem("countdownTitle", title);
+  localStorage.setItem("countdownEndTime", endTime);
+
+  document.getElementById("successMessage")
+    .innerText = "Countdown saved successfully!";
+}
+
+</script>
+
+</body>
+</html>
