@@ -6,6 +6,7 @@
 <title>Countdown Admin</title>
 
 <style>
+
 body{
   font-family:Arial,sans-serif;
   background:#0f172a;
@@ -15,6 +16,7 @@ body{
   align-items:center;
   min-height:100vh;
   margin:0;
+  padding:20px;
 }
 
 .container{
@@ -23,6 +25,7 @@ body{
   background:#1e293b;
   padding:40px;
   border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 h1{
@@ -33,6 +36,7 @@ h1{
 label{
   display:block;
   margin-bottom:10px;
+  color:#cbd5e1;
 }
 
 input{
@@ -54,17 +58,25 @@ button{
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
+  transition:0.2s;
 }
 
 button:hover{
-  background:#2563eb;
+  opacity:0.9;
+}
+
+.reset-btn{
+  margin-top:15px;
+  background:#ef4444;
 }
 
 .success{
   margin-top:20px;
   color:#4ade80;
   text-align:center;
+  font-size:16px;
 }
+
 </style>
 </head>
 
@@ -75,13 +87,27 @@ button:hover{
   <h1>Countdown Admin</h1>
 
   <label>Countdown Title</label>
-  <input type="text" id="title" placeholder="Example: Vacation Countdown">
+  <input
+    type="text"
+    id="title"
+    placeholder="Example: Vacation Countdown"
+  >
 
   <label>End Date & Time</label>
-  <input type="datetime-local" id="endTime">
+  <input
+    type="datetime-local"
+    id="endTime"
+  >
 
   <button onclick="saveCountdown()">
     Save Countdown
+  </button>
+
+  <button
+    class="reset-btn"
+    onclick="resetCountdown()"
+  >
+    Reset Countdown
   </button>
 
   <div class="success" id="successMessage"></div>
@@ -103,11 +129,69 @@ function saveCountdown(){
     return;
   }
 
-  localStorage.setItem("countdownTitle", title);
-  localStorage.setItem("countdownEndTime", endTime);
+  localStorage.setItem(
+    "countdownTitle",
+    title
+  );
 
-  document.getElementById("successMessage")
-    .innerText = "Countdown saved successfully!";
+  localStorage.setItem(
+    "countdownEndTime",
+    endTime
+  );
+
+  document.getElementById(
+    "successMessage"
+  ).innerText =
+    "Countdown saved successfully!";
+}
+
+function resetCountdown(){
+
+  localStorage.removeItem(
+    "countdownTitle"
+  );
+
+  localStorage.removeItem(
+    "countdownEndTime"
+  );
+
+  document.getElementById(
+    "title"
+  ).value = "";
+
+  document.getElementById(
+    "endTime"
+  ).value = "";
+
+  document.getElementById(
+    "successMessage"
+  ).innerText =
+    "Countdown reset successfully!";
+}
+
+window.onload = function(){
+
+  const savedTitle =
+    localStorage.getItem(
+      "countdownTitle"
+    );
+
+  const savedEndTime =
+    localStorage.getItem(
+      "countdownEndTime"
+    );
+
+  if(savedTitle){
+    document.getElementById(
+      "title"
+    ).value = savedTitle;
+  }
+
+  if(savedEndTime){
+    document.getElementById(
+      "endTime"
+    ).value = savedEndTime;
+  }
 }
 
 </script>
