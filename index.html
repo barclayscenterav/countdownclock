@@ -32,7 +32,8 @@ h1{
 
 .countdown{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  grid-template-columns:
+    repeat(auto-fit,minmax(140px,1fr));
   gap:20px;
 }
 
@@ -59,6 +60,18 @@ h1{
   color:#4ade80;
 }
 
+@media(max-width:600px){
+
+  h1{
+    font-size:2rem;
+  }
+
+  .number{
+    font-size:2.5rem;
+  }
+
+}
+
 </style>
 </head>
 
@@ -66,7 +79,9 @@ h1{
 
 <div class="container">
 
-  <h1 id="title">Countdown</h1>
+  <h1 id="title">
+    Countdown
+  </h1>
 
   <div class="countdown">
 
@@ -99,76 +114,127 @@ h1{
 <script>
 
 const title =
-  localStorage.getItem("countdownTitle");
+  localStorage.getItem(
+    "countdownTitle"
+  );
 
 const endTime =
-  localStorage.getItem("countdownEndTime");
+  localStorage.getItem(
+    "countdownEndTime"
+  );
 
-document.getElementById("title").innerText =
+document.getElementById(
+  "title"
+).innerText =
   title || "Countdown";
 
 if(!endTime){
-  document.getElementById("message")
-    .innerText = "No countdown has been set.";
-}
 
-const targetDate =
-  new Date(endTime).getTime();
+  document.getElementById(
+    "message"
+  ).innerText =
+    "No countdown has been set.";
 
-function updateCountdown(){
+} else {
 
-  const now = new Date().getTime();
+  const targetDate =
+    new Date(endTime).getTime();
 
-  const distance =
-    targetDate - now;
+  function updateCountdown(){
 
-  if(distance <= 0){
+    const now =
+      new Date().getTime();
 
-    clearInterval(timer);
+    const distance =
+      targetDate - now;
 
-    document.getElementById("days").innerText = "00";
-    document.getElementById("hours").innerText = "00";
-    document.getElementById("minutes").innerText = "00";
-    document.getElementById("seconds").innerText = "00";
+    if(distance <= 0){
 
-    document.getElementById("message")
-      .innerText = "Countdown Complete!";
+      clearInterval(timer);
 
-    return;
+      document.getElementById(
+        "days"
+      ).innerText = "00";
+
+      document.getElementById(
+        "hours"
+      ).innerText = "00";
+
+      document.getElementById(
+        "minutes"
+      ).innerText = "00";
+
+      document.getElementById(
+        "seconds"
+      ).innerText = "00";
+
+      document.getElementById(
+        "message"
+      ).innerText =
+        "Countdown Complete!";
+
+      return;
+    }
+
+    const days =
+      Math.floor(
+        distance /
+        (1000*60*60*24)
+      );
+
+    const hours =
+      Math.floor(
+        (distance %
+        (1000*60*60*24))
+        /
+        (1000*60*60)
+      );
+
+    const minutes =
+      Math.floor(
+        (distance %
+        (1000*60*60))
+        /
+        (1000*60)
+      );
+
+    const seconds =
+      Math.floor(
+        (distance %
+        (1000*60))
+        /
+        1000
+      );
+
+    document.getElementById(
+      "days"
+    ).innerText =
+      String(days).padStart(2,"0");
+
+    document.getElementById(
+      "hours"
+    ).innerText =
+      String(hours).padStart(2,"0");
+
+    document.getElementById(
+      "minutes"
+    ).innerText =
+      String(minutes).padStart(2,"0");
+
+    document.getElementById(
+      "seconds"
+    ).innerText =
+      String(seconds).padStart(2,"0");
   }
 
-  const days =
-    Math.floor(distance / (1000*60*60*24));
+  updateCountdown();
 
-  const hours =
-    Math.floor((distance % (1000*60*60*24))
-    / (1000*60*60));
-
-  const minutes =
-    Math.floor((distance % (1000*60*60))
-    / (1000*60));
-
-  const seconds =
-    Math.floor((distance % (1000*60))
-    / 1000);
-
-  document.getElementById("days").innerText =
-    String(days).padStart(2,"0");
-
-  document.getElementById("hours").innerText =
-    String(hours).padStart(2,"0");
-
-  document.getElementById("minutes").innerText =
-    String(minutes).padStart(2,"0");
-
-  document.getElementById("seconds").innerText =
-    String(seconds).padStart(2,"0");
+  const timer =
+    setInterval(
+      updateCountdown,
+      1000
+    );
 }
-
-updateCountdown();
-
-const timer =
-  setInterval(updateCountdown,1000);
 
 </script>
 
