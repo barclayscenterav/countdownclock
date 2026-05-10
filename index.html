@@ -33,18 +33,18 @@ h1{
 .countdown{
   display:grid;
   grid-template-columns:
-    repeat(auto-fit,minmax(140px,1fr));
+    repeat(auto-fit,minmax(180px,1fr));
   gap:20px;
 }
 
 .box{
   background:rgba(255,255,255,0.1);
-  padding:30px 20px;
+  padding:40px 20px;
   border-radius:20px;
 }
 
 .number{
-  font-size:4rem;
+  font-size:5rem;
   font-weight:bold;
 }
 
@@ -52,10 +52,17 @@ h1{
   margin-top:10px;
   color:#cbd5e1;
   text-transform:uppercase;
+  font-size:1rem;
+}
+
+#endTimeDisplay{
+  margin-top:30px;
+  color:#cbd5e1;
+  font-size:1.2rem;
 }
 
 #message{
-  margin-top:40px;
+  margin-top:30px;
   font-size:2rem;
   color:#4ade80;
 }
@@ -67,7 +74,7 @@ h1{
   }
 
   .number{
-    font-size:2.5rem;
+    font-size:3rem;
   }
 
 }
@@ -86,11 +93,6 @@ h1{
   <div class="countdown">
 
     <div class="box">
-      <div class="number" id="days">00</div>
-      <div class="label">Days</div>
-    </div>
-
-    <div class="box">
       <div class="number" id="hours">00</div>
       <div class="label">Hours</div>
     </div>
@@ -106,6 +108,8 @@ h1{
     </div>
 
   </div>
+
+  <div id="endTimeDisplay"></div>
 
   <div id="message"></div>
 
@@ -140,6 +144,14 @@ if(!endTime){
   const targetDate =
     new Date(endTime).getTime();
 
+  const formattedDate =
+    new Date(endTime).toLocaleString();
+
+  document.getElementById(
+    "endTimeDisplay"
+  ).innerText =
+    "Ends on: " + formattedDate;
+
   function updateCountdown(){
 
     const now =
@@ -151,10 +163,6 @@ if(!endTime){
     if(distance <= 0){
 
       clearInterval(timer);
-
-      document.getElementById(
-        "days"
-      ).innerText = "00";
 
       document.getElementById(
         "hours"
@@ -176,17 +184,9 @@ if(!endTime){
       return;
     }
 
-    const days =
+    const totalHours =
       Math.floor(
         distance /
-        (1000*60*60*24)
-      );
-
-    const hours =
-      Math.floor(
-        (distance %
-        (1000*60*60*24))
-        /
         (1000*60*60)
       );
 
@@ -207,14 +207,9 @@ if(!endTime){
       );
 
     document.getElementById(
-      "days"
-    ).innerText =
-      String(days).padStart(2,"0");
-
-    document.getElementById(
       "hours"
     ).innerText =
-      String(hours).padStart(2,"0");
+      String(totalHours).padStart(2,"0");
 
     document.getElementById(
       "minutes"
