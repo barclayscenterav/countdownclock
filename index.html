@@ -156,12 +156,15 @@ if(!titleRaw || !end){
 
 /* 🧠 NORMALIZER */
 function normalizeTeamName(input){
+
   return (input || "")
     .toLowerCase()
     .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]/g,"");
+    .replace(/[^a-z0-9\s]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
 }
 
 /* 🏀 NBA */
@@ -237,13 +240,31 @@ function parseMatchup(t){
     right:teams[1]
   };
 }
+const teamAliases = {
+  "76ers": "sixers",
+  "philadelphia 76ers": "sixers",
 
+  "trail blazers": "blazers",
+  "trailblazers": "blazers"
+};
+
+function applyAlias(key){
+  return teamAliases[key] || key;
+}
 /* 🔎 LOOKUP */
 function find(team){
-  const key = normalizeTeamName(team);
+
+  let key = normalizeTeamName(team);
+
+  key = applyAlias(key);
+
+  // FINAL cleanup for lookup consistency
+  key = key.replace(/\s/g,"");
 
   if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
   if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
+
+  console.log("❌ NO MATCH:", team, "→", key);
 
   return null;
 }
