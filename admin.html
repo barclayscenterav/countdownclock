@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Countdown Admin</title>
 
@@ -92,15 +91,16 @@ button:hover{
 
   <h1>Create Countdown</h1>
 
-  <label>Countdown Title</label>
-  <input type="text" id="title" placeholder="Example: Launch Event">
+  <label>Countdown Title (full display)</label>
+  <input type="text" id="title"
+    placeholder="Example: Countdown to Doors">
+
+  <label>Event Label (used in alerts)</label>
+  <input type="text" id="event"
+    placeholder="Example: Doors">
 
   <label>End Date & Time</label>
   <input type="datetime-local" id="endTime">
-
-  <label>Alert Text (use {title} placeholder)</label>
-  <input type="text" id="alertText"
-    placeholder="Example: {title} STARTING SOON">
 
   <button onclick="generateUrl()">
     Generate Shareable URL
@@ -127,29 +127,25 @@ function generateUrl(){
   const title =
     document.getElementById("title").value.trim();
 
+  const event =
+    document.getElementById("event").value.trim();
+
   const endTime =
     document.getElementById("endTime").value;
 
-  let alertText =
-    document.getElementById("alertText").value.trim();
-
-  if(!title || !endTime){
+  if(!title || !event || !endTime){
     alert("Please fill out all fields.");
     return;
-  }
-
-  if(!alertText){
-    alertText = "{time} TO {title}";
   }
 
   const encodedTitle =
     encodeURIComponent(title);
 
-  const encodedEndTime =
-    encodeURIComponent(endTime);
+  const encodedEvent =
+    encodeURIComponent(event);
 
-  const encodedAlert =
-    encodeURIComponent(alertText);
+  const encodedEnd =
+    encodeURIComponent(endTime);
 
   const baseUrl =
     window.location.origin +
@@ -157,7 +153,7 @@ function generateUrl(){
       .replace(/\/admin\.html$/, "/index.html");
 
   const finalUrl =
-    `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}&alert=${encodedAlert}`;
+    `${baseUrl}?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
 
   document.getElementById("shareUrl").value = finalUrl;
   document.getElementById("result").style.display = "block";
