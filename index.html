@@ -97,6 +97,14 @@ h1{
   animation:flashDot 1s infinite;
 }
 
+.tod-label{
+  margin-right:12px;
+}
+
+.tod-clock{
+  display:inline-flex;
+  align-items:center;
+}
 @keyframes flashDot{
   0%,100%{opacity:1;}
   50%{opacity:0.2;}
@@ -568,10 +576,12 @@ function renderClock(){
   const t = formatClock();
 
   timeOfDay.innerHTML = `
-    TIME OF DAY:<sp>
-    <span>${t.h}</span><span class="time-dot">:</span>
-    <span>${t.m}</span><span class="time-dot">:</span>
-    <span>${t.s}</span><span>${t.ampm}</span>
+    <span class="tod-label">TIME OF DAY:</span>
+    <span class="tod-clock">
+      <span>${t.h}</span><span class="time-dot">:</span>
+      <span>${t.m}</span><span class="time-dot">:</span>
+      <span>${t.s}</span><span>${t.ampm}</span>
+    </span>
   `;
 }
 
