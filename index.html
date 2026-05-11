@@ -334,51 +334,49 @@ const wnbaTeams = {
    SMART MATCHUP PARSER
 ========================= */
 
-function parseMatchup(title){
-
-  const normalized =
-    normalizeTeamName(title)
-      .replace(/\s/g,"");
+function parseMatchup(title) {
+  const normalized = normalizeTeamName(title).replace(/\s/g, "");
 
   const allTeams = [
-
     ...Object.keys(nbaTeams),
     ...Object.keys(wnbaTeams),
     ...Object.keys(teamAliases)
   ];
 
-  const found = [];
+  const matches = [];
 
-  for(const team of allTeams){
+  for (const team of allTeams) {
+    const normalizedTeam = team.replace(/\s/g, "");
+    const index = normalized.indexOf(normalizedTeam);
 
-    const normalizedTeam =
-      team.replace(/\s/g,"");
-
-    if(normalized.includes(normalizedTeam)){
-
-      const aliasFixed =
-        applyAlias(team);
-
-      if(!found.includes(aliasFixed)){
-
-        found.push(aliasFixed);
-      }
+    if (index !== -1) {
+      matches.push({
+        team: applyAlias(team),
+        index,
+        length: normalizedTeam.length
+      });
     }
   }
 
-  console.log("FOUND TEAMS:", found);
+  if (matches.length < 2) return null;
 
-  if(found.length < 2){
+  matches.sort((a, b) => a.index - b.index || b.length - a.length);
 
-    return null;
+  const unique = [];
+  for (const match of matches) {
+    if (!unique.includes(match.team)) {
+      unique.push(match.team);
+    }
+    if (unique.length === 2) break;
   }
 
+  if (unique.length < 2) return null;
+
   return {
-    left: found[0],
-    right: found[1]
+    left: unique[0],
+    right: unique[1]
   };
 }
-
 /* =========================
    LOOKUP
 ========================= */
