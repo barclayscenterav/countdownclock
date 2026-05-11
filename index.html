@@ -224,36 +224,6 @@ h1{
 
   <div class="countdown-wrap">
 
-    <!-- DOORS COUNTDOWN -->
-    <div class="countdown-block" id="doorsBlock">
-
-      <div class="countdown-title">
-        Doors
-      </div>
-
-      <div id="doorsTargetTime" class="target-time"></div>
-
-      <div class="countdown">
-
-        <div class="box">
-          <div id="doorsHours" class="number">00</div>
-          <div id="doorsHoursLabel" class="label">Hours</div>
-        </div>
-
-        <div class="box">
-          <div id="doorsMinutes" class="number">00</div>
-          <div id="doorsMinutesLabel" class="label">Minutes</div>
-        </div>
-
-        <div class="box">
-          <div id="doorsSeconds" class="number">00</div>
-          <div id="doorsSecondsLabel" class="label">Seconds</div>
-        </div>
-
-      </div>
-
-    </div>
-
     <!-- VIP DOORS COUNTDOWN -->
     <div class="countdown-block" id="vipBlock">
 
@@ -278,6 +248,36 @@ h1{
         <div class="box">
           <div id="vipSeconds" class="number">00</div>
           <div id="vipSecondsLabel" class="label">Seconds</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DOORS COUNTDOWN -->
+    <div class="countdown-block" id="doorsBlock">
+
+      <div class="countdown-title">
+        Doors
+      </div>
+
+      <div id="doorsTargetTime" class="target-time"></div>
+
+      <div class="countdown">
+
+        <div class="box">
+          <div id="doorsHours" class="number">00</div>
+          <div id="doorsHoursLabel" class="label">Hours</div>
+        </div>
+
+        <div class="box">
+          <div id="doorsMinutes" class="number">00</div>
+          <div id="doorsMinutesLabel" class="label">Minutes</div>
+        </div>
+
+        <div class="box">
+          <div id="doorsSeconds" class="number">00</div>
+          <div id="doorsSecondsLabel" class="label">Seconds</div>
         </div>
 
       </div>
@@ -823,8 +823,8 @@ const eventDateDoors =
 const eventDateVip =
   new Date(vipEnd);
 
-doorsTargetTime.innerText =
-  eventDateDoors.toLocaleString(
+vipTargetTime.innerText =
+  eventDateVip.toLocaleString(
     undefined,
     {
       weekday:"long",
@@ -836,8 +836,8 @@ doorsTargetTime.innerText =
     }
   );
 
-vipTargetTime.innerText =
-  eventDateVip.toLocaleString(
+doorsTargetTime.innerText =
+  eventDateDoors.toLocaleString(
     undefined,
     {
       weekday:"long",
@@ -975,18 +975,13 @@ function tick(){
     );
 
   renderBlock(
-    "doors",
-    doorsParts
-  );
-
-  renderBlock(
     "vip",
     vipParts
   );
 
-  setCountdownBoxState(
-    doorsBlock,
-    doorsRemaining
+  renderBlock(
+    "doors",
+    doorsParts
   );
 
   setCountdownBoxState(
@@ -994,16 +989,21 @@ function tick(){
     vipRemaining
   );
 
+  setCountdownBoxState(
+    doorsBlock,
+    doorsRemaining
+  );
+
   const alerts = [
-    ...collectAlerts(
-      doorsRemaining,
-      triggeredDoors,
-      "DOORS"
-    ),
     ...collectAlerts(
       vipRemaining,
       triggeredVip,
       "VIP DOORS"
+    ),
+    ...collectAlerts(
+      doorsRemaining,
+      triggeredDoors,
+      "DOORS"
     )
   ];
 
