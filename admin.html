@@ -93,19 +93,14 @@ button:hover{
   <h1>Create Countdown</h1>
 
   <label>Countdown Title</label>
-
-  <input
-    type="text"
-    id="title"
-    placeholder="Example: Launch Event"
-  >
+  <input type="text" id="title" placeholder="Example: Launch Event">
 
   <label>End Date & Time</label>
+  <input type="datetime-local" id="endTime">
 
-  <input
-    type="datetime-local"
-    id="endTime"
-  >
+  <label>Alert Text (use {title} placeholder)</label>
+  <input type="text" id="alertText"
+    placeholder="Example: {title} STARTING SOON">
 
   <button onclick="generateUrl()">
     Generate Shareable URL
@@ -115,16 +110,9 @@ button:hover{
 
     <label>Shareable Countdown URL</label>
 
-    <input
-      type="text"
-      id="shareUrl"
-      readonly
-    >
+    <input type="text" id="shareUrl" readonly>
 
-    <button
-      class="copy-btn"
-      onclick="copyUrl()"
-    >
+    <button class="copy-btn" onclick="copyUrl()">
       Copy URL
     </button>
 
@@ -137,22 +125,21 @@ button:hover{
 function generateUrl(){
 
   const title =
-    document.getElementById(
-      "title"
-    ).value.trim();
+    document.getElementById("title").value.trim();
 
   const endTime =
-    document.getElementById(
-      "endTime"
-    ).value;
+    document.getElementById("endTime").value;
+
+  let alertText =
+    document.getElementById("alertText").value.trim();
 
   if(!title || !endTime){
-
-    alert(
-      "Please fill out all fields."
-    );
-
+    alert("Please fill out all fields.");
     return;
+  }
+
+  if(!alertText){
+    alertText = "{time} TO {title}";
   }
 
   const encodedTitle =
@@ -161,33 +148,27 @@ function generateUrl(){
   const encodedEndTime =
     encodeURIComponent(endTime);
 
-  // FORCE index.html
-const baseUrl =
-  window.location.origin +
-  window.location.pathname
-    .replace(/\/admin\.html$/, "/index.html");
+  const encodedAlert =
+    encodeURIComponent(alertText);
+
+  const baseUrl =
+    window.location.origin +
+    window.location.pathname
+      .replace(/\/admin\.html$/, "/index.html");
 
   const finalUrl =
-    `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}`;
+    `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}&alert=${encodedAlert}`;
 
-  document.getElementById(
-    "shareUrl"
-  ).value = finalUrl;
-
-  document.getElementById(
-    "result"
-  ).style.display = "block";
+  document.getElementById("shareUrl").value = finalUrl;
+  document.getElementById("result").style.display = "block";
 }
-  
+
 function copyUrl(){
 
   const urlField =
-    document.getElementById(
-      "shareUrl"
-    );
+    document.getElementById("shareUrl");
 
   urlField.select();
-
   document.execCommand("copy");
 
   alert("URL copied!");
