@@ -18,6 +18,9 @@ body{
   text-align:center;
   overflow:hidden;
   position:relative;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
 
 /* split logos */
@@ -343,12 +346,21 @@ const doorsEnd =
 const vipEnd =
   params.get("vipEnd") || params.get("end");
 
-if(!titleRaw || !doorsEnd || !vipEnd){
+const backgroundImage =
+  params.get("bg") || "";
+
+if(
+  !titleRaw ||
+  !doorsEnd ||
+  !vipEnd
+){
 
   document.body.innerHTML =
     "Invalid countdown link";
 
-  throw new Error("Missing required countdown parameters");
+  throw new Error(
+    "Missing required countdown parameters"
+  );
 }
 
 const doorsTarget =
@@ -365,7 +377,9 @@ if(
   document.body.innerHTML =
     "Invalid countdown date";
 
-  throw new Error("Invalid countdown date");
+  throw new Error(
+    "Invalid countdown date"
+  );
 }
 
 /* =========================
@@ -480,7 +494,8 @@ function parseMatchup(title){
     ...Object.keys(teamAliases)
   ];
 
-  const matches = [];
+  const matches =
+    [];
 
   for(const team of allTeams){
 
@@ -510,7 +525,8 @@ function parseMatchup(title){
       b.length - a.length
   );
 
-  const unique = [];
+  const unique =
+    [];
 
   for(const match of matches){
 
@@ -624,6 +640,29 @@ function applyLogos(){
 }
 
 /* =========================
+   APPLY BACKGROUND
+========================= */
+
+function applyBackground(){
+
+  if(backgroundImage){
+
+    document.body.style.backgroundImage =
+      `url("${backgroundImage}")`;
+
+    bgLeft.style.display =
+      "none";
+
+    bgRight.style.display =
+      "none";
+
+    return;
+  }
+
+  applyLogos();
+}
+
+/* =========================
    ALERT SYSTEM
 ========================= */
 
@@ -636,9 +675,14 @@ const alertTimes = [
   [300000,"5 MINUTES"]
 ];
 
-let triggeredDoors = {};
-let triggeredVip = {};
-let alertTimeout = null;
+let triggeredDoors =
+  {};
+
+let triggeredVip =
+  {};
+
+let alertTimeout =
+  null;
 
 function showAlert(text){
 
@@ -690,7 +734,8 @@ function collectAlerts(
   suffix
 ){
 
-  const messages = [];
+  const messages =
+    [];
 
   for(const [threshold,label] of alertTimes){
 
@@ -852,7 +897,7 @@ doorsTargetTime.innerText =
     }
   );
 
-applyLogos();
+applyBackground();
 
 /* =========================
    BOTTOM CLOCK
@@ -999,14 +1044,14 @@ function tick(){
 
   const alerts = [
     ...collectAlerts(
-      vipRemaining,
-      triggeredVip,
-      "VIP DOORS"
-    ),
-    ...collectAlerts(
       doorsRemaining,
       triggeredDoors,
       "DOORS"
+    ),
+    ...collectAlerts(
+      vipRemaining,
+      triggeredVip,
+      "VIP DOORS"
     )
   ];
 
