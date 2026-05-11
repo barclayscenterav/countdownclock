@@ -226,15 +226,20 @@ const wnbaTeams = {
 function parseMatchup(t){
 
   const cleaned = (t || "")
+    .replace(/\+/g," ")
     .replace(/\s+/g," ")
     .trim();
 
-  const parts = cleaned.split(/\s*(?:vs\.?|v|@)\s*/i);
+  // SAFE SEPARATOR RULES (prevents "Valkyries" breakage)
+  const parts = cleaned.split(/\s+(?:vs\.?|vs|@|\bv\b)\s+/i);
 
   const teams = parts
     .map(normalizeTeamName)
     .filter(Boolean);
 
+  console.log("RAW:", t);
+  console.log("CLEANED:", cleaned);
+  console.log("SPLIT:", parts);
   console.log("TEAMS:", teams);
 
   if(teams.length < 2) return null;
@@ -244,7 +249,6 @@ function parseMatchup(t){
     right: teams[1]
   };
 }
-
 /* 🔎 LOOKUP */
 function find(team){
 
