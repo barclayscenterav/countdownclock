@@ -393,6 +393,9 @@ const vipEnd =
 const backgroundImage =
   params.get("bg") || "";
 
+const fallbackEventImage =
+  "Event_Image.png";
+
 if(
   !titleRaw ||
   !doorsEnd ||
@@ -646,8 +649,20 @@ function logo(team){
 }
 
 /* =========================
-   APPLY LOGOS
+   BACKGROUND HELPERS
 ========================= */
+
+function setFullBackground(imagePath){
+
+  document.body.style.backgroundImage =
+    `url("${imagePath}")`;
+
+  bgLeft.style.display =
+    "none";
+
+  bgRight.style.display =
+    "none";
+}
 
 function applyLogos(){
 
@@ -655,7 +670,7 @@ function applyLogos(){
     parseMatchup(titleRaw);
 
   if(!matchup){
-    return;
+    return false;
   }
 
   const leftTeam =
@@ -670,40 +685,39 @@ function applyLogos(){
   const rightLogo =
     logo(rightTeam);
 
-  if(leftLogo){
-
-    bgLeft.style.backgroundImage =
-      `url(${leftLogo})`;
+  if(!leftLogo || !rightLogo){
+    return false;
   }
 
-  if(rightLogo){
+  bgLeft.style.backgroundImage =
+    `url(${leftLogo})`;
 
-    bgRight.style.backgroundImage =
-      `url(${rightLogo})`;
-  }
+  bgRight.style.backgroundImage =
+    `url(${rightLogo})`;
+
+  return true;
 }
-
-/* =========================
-   APPLY BACKGROUND
-========================= */
 
 function applyBackground(){
 
   if(backgroundImage){
 
-    document.body.style.backgroundImage =
-      `url("${backgroundImage}")`;
-
-    bgLeft.style.display =
-      "none";
-
-    bgRight.style.display =
-      "none";
+    setFullBackground(
+      backgroundImage
+    );
 
     return;
   }
 
-  applyLogos();
+  const logosApplied =
+    applyLogos();
+
+  if(!logosApplied){
+
+    setFullBackground(
+      fallbackEventImage
+    );
+  }
 }
 
 /* =========================
