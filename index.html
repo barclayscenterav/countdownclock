@@ -218,6 +218,10 @@ function parseMatchup(t){
     .map(normalizeTeamName)
     .filter(Boolean);
 
+  console.log("RAW TITLE:", t);
+  console.log("CLEANED:", cleaned);
+  console.log("PARSED TEAMS:", teams);
+
   if(teams.length < 2) return null;
 
   return {
@@ -225,7 +229,6 @@ function parseMatchup(t){
     right:teams[1]
   };
 }
-
 /* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
 function find(team){
 
