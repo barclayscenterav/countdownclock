@@ -78,6 +78,18 @@ button:hover{
   background:#2563eb;
 }
 
+#copyStatus{
+  min-height:22px;
+  text-align:center;
+  font-size:15px;
+  font-weight:bold;
+  color:#22c55e;
+}
+
+#copyStatus.error{
+  color:#f87171;
+}
+
 .preview{
   background:#0f172a;
   border-radius:10px;
@@ -97,12 +109,6 @@ button:hover{
   color:#38bdf8;
   font-size:14px;
   line-height:1.5;
-}
-
-.help{
-  font-size:13px;
-  color:#94a3b8;
-  line-height:1.4;
 }
 </style>
 </head>
@@ -146,25 +152,11 @@ button:hover{
     >
   </div>
 
-  <div class="field">
-    <label for="backgroundImage">
-      Background Image URL Optional
-    </label>
-
-    <input
-      id="backgroundImage"
-      placeholder="e.g. assets/backgrounds/event.jpg"
-    >
-
-    <div class="help">
-      Upload the image to your GitHub repo first, then paste the image path here.
-      Leave blank for automatic basketball team logos.
-    </div>
-  </div>
-
   <button onclick="copyURL()">
     Copy URL
   </button>
+
+  <div id="copyStatus"></div>
 
   <div class="preview">
     <div class="preview-title">
@@ -188,11 +180,41 @@ const doorsEndInput =
 const vipEndInput =
   document.getElementById("vipEnd");
 
-const backgroundImageInput =
-  document.getElementById("backgroundImage");
-
 const urlPreview =
   document.getElementById("urlPreview");
+
+const copyStatus =
+  document.getElementById("copyStatus");
+
+let statusTimeout =
+  null;
+
+function showStatus(message, isError){
+
+  if(statusTimeout){
+    clearTimeout(statusTimeout);
+  }
+
+  copyStatus.innerText =
+    message;
+
+  copyStatus.classList.toggle(
+    "error",
+    isError
+  );
+
+  statusTimeout =
+    setTimeout(() => {
+
+      copyStatus.innerText =
+        "";
+
+      copyStatus.classList.remove(
+        "error"
+      );
+
+    }, 3000);
+}
 
 function buildURL(){
 
@@ -204,9 +226,6 @@ function buildURL(){
 
   const vipEnd =
     vipEndInput.value;
-
-  const backgroundImage =
-    backgroundImageInput.value.trim();
 
   const base =
     window.location.origin +
@@ -230,14 +249,6 @@ function buildURL(){
     vipEnd
   );
 
-  if(backgroundImage){
-
-    url.searchParams.set(
-      "bg",
-      backgroundImage
-    );
-  }
-
   return url.toString();
 }
 
@@ -251,6 +262,13 @@ function updatePreview(){
 
   const vipEnd =
     vipEndInput.value.trim();
+
+  copyStatus.innerText =
+    "";
+
+  copyStatus.classList.remove(
+    "error"
+  );
 
   if(
     !title ||
@@ -285,8 +303,9 @@ async function copyURL(){
     !vipEnd
   ){
 
-    alert(
-      "Please complete the event title, VIP doors time, and doors time."
+    showStatus(
+      "Please complete all fields.",
+      true
     );
 
     return;
@@ -301,14 +320,16 @@ async function copyURL(){
       url
     );
 
-    alert(
-      "URL copied!"
+    showStatus(
+      "URL Copied",
+      false
     );
 
   }catch(err){
 
-    alert(
-      "Copy failed. Please copy the URL manually."
+    showStatus(
+      "Copy failed. Please copy the URL manually.",
+      true
     );
   }
 }
@@ -324,11 +345,6 @@ doorsEndInput.addEventListener(
 );
 
 vipEndInput.addEventListener(
-  "input",
-  updatePreview
-);
-
-backgroundImageInput.addEventListener(
   "input",
   updatePreview
 );
