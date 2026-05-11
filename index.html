@@ -73,7 +73,7 @@ h1{
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.9);
   display:none;
   justify-content:center;
   align-items:center;
@@ -83,7 +83,8 @@ h1{
 #alertBox{
   font-size:3rem;
   font-weight:bold;
-  color:white;
+  color:red;
+  text-transform:uppercase;
   text-align:center;
   padding:20px;
   animation:pulse 1s infinite;
@@ -91,7 +92,7 @@ h1{
 
 @keyframes pulse{
   0%{transform:scale(1);}
-  50%{transform:scale(1.1);}
+  50%{transform:scale(1.15);}
   100%{transform:scale(1);}
 }
 
@@ -164,7 +165,12 @@ if(!title || !end){
 
   function showAlert(text){
 
-    document.getElementById("alertBox").innerText = text;
+    const box = document.getElementById("alertBox");
+
+    box.innerText = text;
+    box.style.color = "red";
+    box.style.textTransform = "uppercase";
+
     document.getElementById("alertOverlay").style.display = "flex";
 
     setTimeout(()=>{
@@ -205,7 +211,7 @@ if(!title || !end){
     document.getElementById("seconds").innerText =
       String(seconds).padStart(2,"0");
 
-    // Labels
+    // labels
     document.getElementById("hoursLabel").innerText =
       hours === 1 ? "Hour" : "Hours";
 
@@ -215,39 +221,30 @@ if(!title || !end){
     document.getElementById("secondsLabel").innerText =
       seconds === 1 ? "Second" : "Seconds";
 
-    // ALERT TRIGGERS
+    // alert triggers
     let alertKey = "";
 
-    if(totalMinutes === 30 && seconds === 0){
-      alertKey = "30";
-    }
-    else if(totalMinutes === 15 && seconds === 0){
-      alertKey = "15";
-    }
-    else if(totalMinutes === 10 && seconds === 0){
-      alertKey = "10";
-    }
-    else if(totalMinutes === 5 && seconds === 0){
-      alertKey = "5";
-    }
-    else if(totalMinutes % 60 === 0 && seconds === 0 && totalMinutes > 0){
+    if(totalMinutes === 30 && seconds === 0) alertKey = "30";
+    else if(totalMinutes === 15 && seconds === 0) alertKey = "15";
+    else if(totalMinutes === 10 && seconds === 0) alertKey = "10";
+    else if(totalMinutes === 5 && seconds === 0) alertKey = "5";
+    else if(totalMinutes % 60 === 0 && seconds === 0 && totalMinutes > 0)
       alertKey = "hour-" + totalMinutes;
-    }
 
     if(alertKey && alertKey !== lastAlertKey){
 
       lastAlertKey = alertKey;
 
-      let timeText = "";
+      let timeText;
 
       if(totalMinutes >= 60){
         const hrs = Math.floor(totalMinutes / 60);
-        timeText = `${hrs} hour${hrs === 1 ? "" : "s"}`;
+        timeText = `${hrs} HOUR${hrs === 1 ? "" : "S"}`;
       } else {
-        timeText = `${totalMinutes} minute${totalMinutes === 1 ? "" : "s"}`;
+        timeText = `${totalMinutes} MINUTE${totalMinutes === 1 ? "" : "S"}`;
       }
 
-      showAlert(`${timeText} to ${title}`);
+      showAlert(`${timeText} TO ${title}`);
     }
   }
 
