@@ -1,161 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Countdown Admin</title>
-
+<title>Admin</title>
 <style>
-
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial;
   background:#0f172a;
   color:white;
   display:flex;
   justify-content:center;
   align-items:center;
-  min-height:100vh;
-  padding:20px;
+  height:100vh;
 }
 
-.container{
-  width:100%;
-  max-width:600px;
+.box{
   background:#1e293b;
-  padding:40px;
-  border-radius:20px;
-}
-
-h1{
-  text-align:center;
-  margin-bottom:30px;
-}
-
-label{
-  display:block;
-  margin-bottom:10px;
-  color:#cbd5e1;
+  padding:30px;
+  border-radius:12px;
+  width:400px;
 }
 
 input{
   width:100%;
-  padding:14px;
-  margin-bottom:25px;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
+  margin:10px 0;
+  padding:10px;
 }
 
 button{
   width:100%;
-  padding:15px;
-  border:none;
-  border-radius:10px;
+  padding:12px;
   background:#3b82f6;
   color:white;
-  font-size:16px;
-  font-weight:bold;
+  border:none;
   cursor:pointer;
 }
-
-button:hover{
-  background:#2563eb;
-}
-
-#result{
-  margin-top:30px;
-  display:none;
-}
-
-#shareUrl{
-  width:100%;
-  margin-top:15px;
-  background:#0f172a;
-  color:#4ade80;
-}
-
-.copy-btn{
-  margin-top:15px;
-  background:#10b981;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
+<h2>Create Countdown</h2>
 
-  <h1>Create Countdown</h1>
+<input id="title" placeholder="Title (e.g. Knicks vs Celtics)">
+<input id="event" placeholder="Alert text (e.g. Game)">
+<input id="end" type="datetime-local">
 
-  <label>Countdown Title</label>
-  <input type="text" id="title">
+<button onclick="gen()">Generate</button>
 
-  <label>Event Label (alerts)</label>
-  <input type="text" id="event">
-
-  <label>End Date & Time</label>
-  <input type="datetime-local" id="endTime">
-
-  <button onclick="generateUrl()">
-    Generate Shareable URL
-  </button>
-
-  <div id="result">
-
-    <label>Shareable URL</label>
-
-    <input type="text" id="shareUrl" readonly>
-
-    <button class="copy-btn" onclick="copyUrl()">
-      Copy URL
-    </button>
-
-  </div>
-
+<input id="out" readonly>
 </div>
 
 <script>
 
-function generateUrl(){
+function gen(){
 
-  const title =
-    document.getElementById("title").value.trim();
+  const t = title.value;
+  const e = event.value;
+  const end = end.value;
 
-  const event =
-    document.getElementById("event").value.trim();
+  const base =
+    window.location.origin +
+    "/countdownclock/index.html";
 
-  const endTime =
-    document.getElementById("endTime").value;
+  const url =
+`${base}?title=${encodeURIComponent(t)}&event=${encodeURIComponent(e)}&end=${encodeURIComponent(end)}`;
 
-  if(!title || !event || !endTime){
-    alert("Please fill out all fields.");
-    return;
-  }
-
-  const encodedTitle = encodeURIComponent(title);
-  const encodedEvent = encodeURIComponent(event);
-  const encodedEnd = encodeURIComponent(endTime);
-
-  // 🔥 FIXED: hard-coded correct GitHub Pages path
-  const finalUrl =
-    `https://barclayscenterav.github.io/countdownclock/index?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
-
-  document.getElementById("shareUrl").value = finalUrl;
-  document.getElementById("result").style.display = "block";
-}
-
-function copyUrl(){
-
-  const urlField =
-    document.getElementById("shareUrl");
-
-  urlField.select();
-  document.execCommand("copy");
-
-  alert("URL copied!");
+  out.value = url;
 }
 
 </script>
