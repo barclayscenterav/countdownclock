@@ -139,9 +139,9 @@ function generateUrl(){
   const encodedEvent = encodeURIComponent(event);
   const encodedEnd = encodeURIComponent(endTime);
 
-  // 🔥 HARD FORCE index.html (no dependency on current path)
+  // 🔥 FIXED: hard-coded correct GitHub Pages path
   const finalUrl =
-    `${window.location.origin}/index.html?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
+    `https://barclayscenterav.github.io/countdownclock/index?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
 
   document.getElementById("shareUrl").value = finalUrl;
   document.getElementById("result").style.display = "block";
