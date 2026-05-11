@@ -18,10 +18,12 @@ body{
   min-height:100vh;
   text-align:center;
   padding:20px;
-  transition: background 0.5s ease;
+
+  /* 🔥 smooth transition */
+  transition: background 5s ease;
 }
 
-/* RED MODE (last 5 min) */
+/* RED MODE */
 body.red-alert{
   background:linear-gradient(135deg,#3b0000,#7f0000);
 }
@@ -31,13 +33,11 @@ body.red-alert{
   max-width:900px;
 }
 
-/* MAIN TITLE */
 h1{
   font-size:3rem;
   margin-bottom:10px;
 }
 
-/* EVENT TIME DISPLAY */
 #targetTime{
   font-size:3rem;
   font-weight:bold;
@@ -160,6 +160,7 @@ const event = params.get("event") || title;
 const end = params.get("end");
 
 let lastAlertKey = "";
+let redModeTriggered = false;
 
 if(!title || !end){
 
@@ -209,15 +210,16 @@ if(!title || !end){
       return;
     }
 
+    // 🔥 FIXED: precise red trigger at 5 minutes (300,000ms)
+    if(distance <= 300000 && !redModeTriggered){
+      redModeTriggered = true;
+      document.body.classList.add("red-alert");
+    }
+
     const totalMinutes = Math.floor(distance / (1000 * 60));
     const hours = Math.floor(distance / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // 🔥 RED MODE LAST 5 MINUTES
-    if(totalMinutes <= 5){
-      document.body.classList.add("red-alert");
-    }
 
     document.getElementById("hours").innerText =
       String(hours).padStart(2,"0");
@@ -261,7 +263,6 @@ if(!title || !end){
         timeText = `${totalMinutes} MINUTE${totalMinutes === 1 ? "" : "S"}`;
       }
 
-      // ✅ USE EVENT LABEL HERE
       showAlert(`${timeText} TO ${event}`);
     }
   }
