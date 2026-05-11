@@ -66,7 +66,7 @@ h1{
   color:#4ade80;
 }
 
-/* FULL SCREEN ALERT */
+/* ALERT OVERLAY */
 #alertOverlay{
   position:fixed;
   top:0;
@@ -78,14 +78,14 @@ h1{
   justify-content:center;
   align-items:center;
   z-index:9999;
-  text-align:center;
-  padding:20px;
 }
 
 #alertBox{
   font-size:3rem;
   font-weight:bold;
   color:white;
+  text-align:center;
+  padding:20px;
   animation:pulse 1s infinite;
 }
 
@@ -134,7 +134,7 @@ h1{
 
 </div>
 
-<!-- ALERT OVERLAY -->
+<!-- ALERT -->
 <div id="alertOverlay">
   <div id="alertBox"></div>
 </div>
@@ -215,16 +215,10 @@ if(!title || !end){
     document.getElementById("secondsLabel").innerText =
       seconds === 1 ? "Second" : "Seconds";
 
-    // ALERT LOGIC
+    // ALERT TRIGGERS
     let alertKey = "";
 
-    if(totalMinutes === 0 && seconds === 0){
-      alertKey = "final";
-    }
-    else if(totalMinutes % 60 === 0 && seconds === 0){
-      alertKey = "hour-" + totalMinutes;
-    }
-    else if(totalMinutes === 30 && seconds === 0){
+    if(totalMinutes === 30 && seconds === 0){
       alertKey = "30";
     }
     else if(totalMinutes === 15 && seconds === 0){
@@ -236,20 +230,24 @@ if(!title || !end){
     else if(totalMinutes === 5 && seconds === 0){
       alertKey = "5";
     }
+    else if(totalMinutes % 60 === 0 && seconds === 0 && totalMinutes > 0){
+      alertKey = "hour-" + totalMinutes;
+    }
 
     if(alertKey && alertKey !== lastAlertKey){
 
       lastAlertKey = alertKey;
 
-      if(alertKey === "final"){
-        showAlert("FINAL MINUTE!");
+      let timeText = "";
+
+      if(totalMinutes >= 60){
+        const hrs = Math.floor(totalMinutes / 60);
+        timeText = `${hrs} hour${hrs === 1 ? "" : "s"}`;
+      } else {
+        timeText = `${totalMinutes} minute${totalMinutes === 1 ? "" : "s"}`;
       }
-      else if(alertKey.startsWith("hour-")){
-        showAlert("HOUR MARK REACHED!");
-      }
-      else{
-        showAlert(totalMinutes + " MINUTES LEFT!");
-      }
+
+      showAlert(`${timeText} to ${title}`);
     }
   }
 
