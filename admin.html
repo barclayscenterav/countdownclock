@@ -26,7 +26,6 @@ body{
   background:#1e293b;
   padding:40px;
   border-radius:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 h1{
@@ -91,13 +90,11 @@ button:hover{
 
   <h1>Create Countdown</h1>
 
-  <label>Countdown Title (full display)</label>
-  <input type="text" id="title"
-    placeholder="Example: Countdown to Doors">
+  <label>Countdown Title</label>
+  <input type="text" id="title">
 
-  <label>Event Label (used in alerts)</label>
-  <input type="text" id="event"
-    placeholder="Example: Doors">
+  <label>Event Label (alerts)</label>
+  <input type="text" id="event">
 
   <label>End Date & Time</label>
   <input type="datetime-local" id="endTime">
@@ -108,7 +105,7 @@ button:hover{
 
   <div id="result">
 
-    <label>Shareable Countdown URL</label>
+    <label>Shareable URL</label>
 
     <input type="text" id="shareUrl" readonly>
 
@@ -138,22 +135,13 @@ function generateUrl(){
     return;
   }
 
-  const encodedTitle =
-    encodeURIComponent(title);
+  const encodedTitle = encodeURIComponent(title);
+  const encodedEvent = encodeURIComponent(event);
+  const encodedEnd = encodeURIComponent(endTime);
 
-  const encodedEvent =
-    encodeURIComponent(event);
-
-  const encodedEnd =
-    encodeURIComponent(endTime);
-
-  const baseUrl =
-    window.location.origin +
-    window.location.pathname
-      .replace(/\/admin\.html$/, "/index.html");
-
+  // 🔥 HARD FORCE index.html (no dependency on current path)
   const finalUrl =
-    `${baseUrl}?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
+    `${window.location.origin}/index.html?title=${encodedTitle}&event=${encodedEvent}&end=${encodedEnd}`;
 
   document.getElementById("shareUrl").value = finalUrl;
   document.getElementById("result").style.display = "block";
