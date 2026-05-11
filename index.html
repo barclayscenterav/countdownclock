@@ -606,102 +606,57 @@ apply();
    LOOP
 ========================= */
 
-function tick(){
+function tick() {
+  const now = Date.now();
+  const d = target - now;
 
-  const now =
-    Date.now();
+  if (d <= 0) {
+    hours.innerText = "00";
+    minutes.innerText = "00";
+    seconds.innerText = "00";
 
-  const d =
-    target - now;
+    document.querySelectorAll(".box")[0].querySelector(".label").innerText = "Hours";
+    document.querySelectorAll(".box")[1].querySelector(".label").innerText = "Minutes";
+    document.querySelectorAll(".box")[2].querySelector(".label").innerText = "Seconds";
 
-  if(d <= 0) return;
+    document.body.classList.remove("yellow-alert");
+    document.body.classList.add("red-alert");
 
-  const h =
-    String(
-      Math.floor(d/3600000)
-    ).padStart(2,"0");
+    return;
+  }
 
-  const m =
-    String(
-      Math.floor((d%3600000)/60000)
-    ).padStart(2,"0");
-
-  const s =
-    String(
-      Math.floor((d%60000)/1000)
-    ).padStart(2,"0");
+  const h = String(Math.floor(d / 3600000)).padStart(2, "0");
+  const m = String(Math.floor((d % 3600000) / 60000)).padStart(2, "0");
+  const s = String(Math.floor((d % 60000) / 1000)).padStart(2, "0");
 
   hours.innerText = h;
   minutes.innerText = m;
   seconds.innerText = s;
 
-  /* singular labels */
+  document.querySelectorAll(".box")[0].querySelector(".label").innerText =
+    labelSingular(h, "Hour", "Hours");
+  document.querySelectorAll(".box")[1].querySelector(".label").innerText =
+    labelSingular(m, "Minute", "Minutes");
+  document.querySelectorAll(".box")[2].querySelector(".label").innerText =
+    labelSingular(s, "Second", "Seconds");
 
-  document
-    .querySelectorAll(".box")[0]
-    .querySelector(".label")
-    .innerText =
-      labelSingular(
-        h,
-        "Hour",
-        "Hours"
-      );
-
-  document
-    .querySelectorAll(".box")[1]
-    .querySelector(".label")
-    .innerText =
-      labelSingular(
-        m,
-        "Minute",
-        "Minutes"
-      );
-
-  document
-    .querySelectorAll(".box")[2]
-    .querySelector(".label")
-    .innerText =
-      labelSingular(
-        s,
-        "Second",
-        "Seconds"
-      );
-
-  /* color states */
-
-  if(d <= 1800000){
-
-    document.body.classList.add(
-      "yellow-alert"
-    );
+  if (d <= 1800000) {
+    document.body.classList.add("yellow-alert");
   }
 
-  if(d <= 600000){
-
-    document.body.classList.remove(
-      "yellow-alert"
-    );
-
-    document.body.classList.add(
-      "red-alert"
-    );
+  if (d <= 600000) {
+    document.body.classList.remove("yellow-alert");
+    document.body.classList.add("red-alert");
   }
 
-  /* alerts */
-
-  for(const [a,label] of alertTimes){
-
-    if(d <= a && !triggered[a]){
-
+  for (const [a, label] of alertTimes) {
+    if (d <= a && !triggered[a]) {
       triggered[a] = true;
-
-      showAlert(
-        `${label} TO ${eventName}`
-      );
+      showAlert(`${label} TO ${eventName}`);
     }
   }
 }
-
+  
 tick();
 
 setInterval(
