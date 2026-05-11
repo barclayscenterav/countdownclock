@@ -121,22 +121,25 @@ h1{
   color:#cbd5e1;
 }
 
-/* independent yellow state */
-.countdown-block.state-yellow .box{
+/* yellow state applied directly to boxes */
+.box.state-yellow{
   background:rgba(234,179,8,0.45);
   border-color:#eab308;
   box-shadow:0 0 28px rgba(234,179,8,0.65);
 }
 
-/* independent red state */
-.countdown-block.state-red .box{
+.box.state-yellow .label{
+  color:white;
+}
+
+/* red state applied directly to boxes */
+.box.state-red{
   background:rgba(220,38,38,0.55);
   border-color:#ef4444;
   box-shadow:0 0 32px rgba(220,38,38,0.8);
 }
 
-.countdown-block.state-red .label,
-.countdown-block.state-yellow .label{
+.box.state-red .label{
   color:white;
 }
 
@@ -235,17 +238,17 @@ h1{
 
       <div class="countdown">
 
-        <div class="box">
+        <div class="box vip-box">
           <div id="vipHours" class="number">00</div>
           <div id="vipHoursLabel" class="label">Hours</div>
         </div>
 
-        <div class="box">
+        <div class="box vip-box">
           <div id="vipMinutes" class="number">00</div>
           <div id="vipMinutesLabel" class="label">Minutes</div>
         </div>
 
-        <div class="box">
+        <div class="box vip-box">
           <div id="vipSeconds" class="number">00</div>
           <div id="vipSecondsLabel" class="label">Seconds</div>
         </div>
@@ -265,17 +268,17 @@ h1{
 
       <div class="countdown">
 
-        <div class="box">
+        <div class="box doors-box">
           <div id="doorsHours" class="number">00</div>
           <div id="doorsHoursLabel" class="label">Hours</div>
         </div>
 
-        <div class="box">
+        <div class="box doors-box">
           <div id="doorsMinutes" class="number">00</div>
           <div id="doorsMinutesLabel" class="label">Minutes</div>
         </div>
 
-        <div class="box">
+        <div class="box doors-box">
           <div id="doorsSeconds" class="number">00</div>
           <div id="doorsSecondsLabel" class="label">Seconds</div>
         </div>
@@ -308,12 +311,6 @@ const bgLeft =
 
 const bgRight =
   document.getElementById("bgRight");
-
-const doorsBlock =
-  document.getElementById("doorsBlock");
-
-const vipBlock =
-  document.getElementById("vipBlock");
 
 const doorsTargetTime =
   document.getElementById("doorsTargetTime");
@@ -786,28 +783,34 @@ function renderBlock(prefix, parts){
     );
 }
 
-function setCountdownBoxState(block, remaining){
+function setBoxAlertState(boxClass, remaining){
 
-  block.classList.remove(
-    "state-yellow",
-    "state-red"
-  );
+  const boxes =
+    document.querySelectorAll(`.${boxClass}`);
 
-  if(remaining <= 600000){
+  boxes.forEach(box => {
 
-    block.classList.add(
+    box.classList.remove(
+      "state-yellow",
       "state-red"
     );
 
-    return;
-  }
+    if(remaining <= 600000){
 
-  if(remaining <= 1800000){
+      box.classList.add(
+        "state-red"
+      );
 
-    block.classList.add(
-      "state-yellow"
-    );
-  }
+      return;
+    }
+
+    if(remaining <= 1800000){
+
+      box.classList.add(
+        "state-yellow"
+      );
+    }
+  });
 }
 
 /* =========================
@@ -984,13 +987,13 @@ function tick(){
     doorsParts
   );
 
-  setCountdownBoxState(
-    vipBlock,
+  setBoxAlertState(
+    "vip-box",
     vipRemaining
   );
 
-  setCountdownBoxState(
-    doorsBlock,
+  setBoxAlertState(
+    "doors-box",
     doorsRemaining
   );
 
