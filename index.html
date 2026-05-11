@@ -6,7 +6,6 @@
 <title>Barclays Center Countdown</title>
 
 <style>
-
 body{
   margin:0;
   font-family:Arial,sans-serif;
@@ -61,17 +60,62 @@ body.red-alert{
   position:relative;
   z-index:2;
   max-width:900px;
+  width:100%;
+  padding:20px;
 }
 
 h1{
   font-size:3rem;
   text-transform:uppercase;
+  margin:0 0 10px;
 }
 
 #targetTime{
   font-size:2.2rem;
   color:#cbd5e1;
   margin-bottom:10px;
+}
+
+/* countdown sections */
+.countdown-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+}
+
+.countdown-block{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.countdown-title{
+  font-size:1.5rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:#ffffff;
+}
+
+.countdown{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.box{
+  background:rgba(255,255,255,0.1);
+  padding:30px;
+  border-radius:20px;
+}
+
+.number{
+  font-size:5rem;
+}
+
+.label{
+  text-transform:uppercase;
+  color:#cbd5e1;
 }
 
 /* bottom clock */
@@ -105,30 +149,10 @@ h1{
   display:inline-flex;
   align-items:center;
 }
+
 @keyframes flashDot{
   0%,100%{opacity:1;}
   50%{opacity:0.2;}
-}
-
-.countdown{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
-
-.box{
-  background:rgba(255,255,255,0.1);
-  padding:30px;
-  border-radius:20px;
-}
-
-.number{
-  font-size:5rem;
-}
-
-.label{
-  text-transform:uppercase;
-  color:#cbd5e1;
 }
 
 /* alert overlay */
@@ -147,13 +171,13 @@ h1{
   font-weight:900;
   color:red;
   text-transform:uppercase;
-
   animation:flashAlert 0.7s infinite;
+  white-space:pre-line;
+  line-height:1.1;
 }
 
 /* flashing animation */
 @keyframes flashAlert{
-
   0%{
     opacity:1;
     transform:scale(1);
@@ -169,7 +193,6 @@ h1{
     transform:scale(1);
   }
 }
-
 </style>
 </head>
 
@@ -184,25 +207,49 @@ h1{
 
   <div id="targetTime"></div>
 
-  <div class="countdown">
+  <div class="countdown-wrap">
 
-    <div class="box">
-      <div id="hours" class="number">00</div>
-      <div class="label">Hours</div>
+    <div class="countdown-block">
+      <div class="countdown-title">Doors</div>
+      <div class="countdown">
+        <div class="box">
+          <div id="doorsHours" class="number">00</div>
+          <div id="doorsHoursLabel" class="label">Hours</div>
+        </div>
+
+        <div class="box">
+          <div id="doorsMinutes" class="number">00</div>
+          <div id="doorsMinutesLabel" class="label">Minutes</div>
+        </div>
+
+        <div class="box">
+          <div id="doorsSeconds" class="number">00</div>
+          <div id="doorsSecondsLabel" class="label">Seconds</div>
+        </div>
+      </div>
     </div>
 
-    <div class="box">
-      <div id="minutes" class="number">00</div>
-      <div class="label">Minutes</div>
-    </div>
+    <div class="countdown-block">
+      <div class="countdown-title">VIP Doors</div>
+      <div class="countdown">
+        <div class="box">
+          <div id="vipHours" class="number">00</div>
+          <div id="vipHoursLabel" class="label">Hours</div>
+        </div>
 
-    <div class="box">
-      <div id="seconds" class="number">00</div>
-      <div class="label">Seconds</div>
+        <div class="box">
+          <div id="vipMinutes" class="number">00</div>
+          <div id="vipMinutesLabel" class="label">Minutes</div>
+        </div>
+
+        <div class="box">
+          <div id="vipSeconds" class="number">00</div>
+          <div id="vipSecondsLabel" class="label">Seconds</div>
+        </div>
+      </div>
     </div>
 
   </div>
-
 </div>
 
 <div id="timeOfDay"></div>
@@ -223,16 +270,32 @@ const params =
 const titleRaw =
   params.get("title") || "";
 
-const eventName =
-  params.get("event") || titleRaw;
+const doorsEnd =
+  params.get("doorsEnd");
 
-const end =
-  params.get("end");
+const vipEnd =
+  params.get("vipEnd");
 
-if(!titleRaw || !end){
+if(!titleRaw || !doorsEnd || !vipEnd){
 
   document.body.innerHTML =
     "Invalid countdown link";
+
+  throw new Error("Missing required countdown parameters");
+}
+
+const doorsTarget =
+  new Date(doorsEnd).getTime();
+
+const vipTarget =
+  new Date(vipEnd).getTime();
+
+if(Number.isNaN(doorsTarget) || Number.isNaN(vipTarget)){
+
+  document.body.innerHTML =
+    "Invalid countdown date";
+
+  throw new Error("Invalid date values");
 }
 
 /* =========================
@@ -377,6 +440,7 @@ function parseMatchup(title) {
     right: unique[1]
   };
 }
+
 /* =========================
    LOOKUP
 ========================= */
@@ -454,13 +518,11 @@ function apply(){
     logo(rightTeam);
 
   if(leftLogo){
-
     bgLeft.style.backgroundImage =
       `url(${leftLogo})`;
   }
 
   if(rightLogo){
-
     bgRight.style.backgroundImage =
       `url(${rightLogo})`;
   }
@@ -473,18 +535,12 @@ function apply(){
 function showAlert(text){
 
   alertBox.innerText = text;
-
   alertOverlay.style.display = "flex";
 
   setTimeout(() => {
-
     alertOverlay.style.display = "none";
-
   }, 10000);
 }
-
-const target =
-  new Date(end).getTime();
 
 const alertTimes = [
 
@@ -495,7 +551,8 @@ const alertTimes = [
   [300000,"5 MINUTES"]
 ];
 
-let triggered = {};
+let triggeredDoors = {};
+let triggeredVip = {};
 
 /* refresh-safe init */
 (function initTriggered(){
@@ -503,13 +560,19 @@ let triggered = {};
   const now =
     Date.now();
 
-  const remaining =
-    target - now;
+  const remainingDoors =
+    doorsTarget - now;
+
+  const remainingVip =
+    vipTarget - now;
 
   for(const [time] of alertTimes){
 
-    triggered[time] =
-      remaining <= time;
+    triggeredDoors[time] =
+      remainingDoors <= time;
+
+    triggeredVip[time] =
+      remainingVip <= time;
   }
 
 })();
@@ -518,15 +581,72 @@ let triggered = {};
    LABEL FIX
 ========================= */
 
-function labelSingular(
-  value,
-  singular,
-  plural
-){
+function labelSingular(value, singular, plural){
 
   return Number(value) === 1
     ? singular
     : plural;
+}
+
+/* =========================
+   COUNTDOWN HELPERS
+========================= */
+
+function getCountdownParts(ms){
+
+  const safe =
+    Math.max(0, ms);
+
+  const hNum =
+    Math.floor(safe / 3600000);
+
+  const mNum =
+    Math.floor((safe % 3600000) / 60000);
+
+  const sNum =
+    Math.floor((safe % 60000) / 1000);
+
+  return {
+    hNum,
+    mNum,
+    sNum,
+    h: String(hNum).padStart(2,"0"),
+    m: String(mNum).padStart(2,"0"),
+    s: String(sNum).padStart(2,"0")
+  };
+}
+
+function renderBlock(prefix, parts){
+
+  document.getElementById(`${prefix}Hours`).innerText = parts.h;
+  document.getElementById(`${prefix}Minutes`).innerText = parts.m;
+  document.getElementById(`${prefix}Seconds`).innerText = parts.s;
+
+  document.getElementById(`${prefix}HoursLabel`).innerText =
+    labelSingular(parts.hNum, "Hour", "Hours");
+
+  document.getElementById(`${prefix}MinutesLabel`).innerText =
+    labelSingular(parts.mNum, "Minute", "Minutes");
+
+  document.getElementById(`${prefix}SecondsLabel`).innerText =
+    labelSingular(parts.sNum, "Second", "Seconds");
+}
+
+function collectAlerts(remaining, triggeredMap, suffix){
+
+  const messages = [];
+
+  for(const [threshold, label] of alertTimes){
+
+    if(remaining <= threshold && !triggeredMap[threshold]){
+
+      triggeredMap[threshold] = true;
+
+      messages.push(`${label} TO ${suffix}`);
+    }
+  }
+
+  return messages;
 }
 
 /* =========================
@@ -536,22 +656,29 @@ function labelSingular(
 title.innerText =
   titleRaw.toUpperCase();
 
-const eventDate =
-  new Date(end);
+const eventDateDoors =
+  new Date(doorsEnd);
+
+const eventDateVip =
+  new Date(vipEnd);
 
 /* top display */
 targetTime.innerText =
-  eventDate.toLocaleString(
-    undefined,
-    {
-      weekday:"long",
-      month:"long",
-      day:"numeric",
-      year:"numeric",
-      hour:"numeric",
-      minute:"2-digit"
-    }
-  );
+  `Doors: ${eventDateDoors.toLocaleString(undefined, {
+    weekday:"long",
+    month:"long",
+    day:"numeric",
+    year:"numeric",
+    hour:"numeric",
+    minute:"2-digit"
+  })}   |   VIP Doors: ${eventDateVip.toLocaleString(undefined, {
+    weekday:"long",
+    month:"long",
+    day:"numeric",
+    year:"numeric",
+    hour:"numeric",
+    minute:"2-digit"
+  })}`;
 
 /* bottom display */
 function formatClock(){
@@ -606,63 +733,57 @@ apply();
    LOOP
 ========================= */
 
-function tick() {
+function tick(){
+
   const now = Date.now();
-  const d = target - now;
 
-  if (d <= 0) {
-    hours.innerText = "00";
-    minutes.innerText = "00";
-    seconds.innerText = "00";
+  const doorsRemaining =
+    doorsTarget - now;
 
-    document.querySelectorAll(".box")[0].querySelector(".label").innerText = "Hours";
-    document.querySelectorAll(".box")[1].querySelector(".label").innerText = "Minutes";
-    document.querySelectorAll(".box")[2].querySelector(".label").innerText = "Seconds";
+  const vipRemaining =
+    vipTarget - now;
 
-    document.body.classList.remove("yellow-alert");
+  const doorsParts =
+    getCountdownParts(doorsRemaining);
+
+  const vipParts =
+    getCountdownParts(vipRemaining);
+
+  renderBlock("doors", doorsParts);
+  renderBlock("vip", vipParts);
+
+  document.body.classList.remove("yellow-alert", "red-alert");
+
+  if(doorsRemaining <= 0){
     document.body.classList.add("red-alert");
-
-    return;
-  }
-
-  const h = String(Math.floor(d / 3600000)).padStart(2, "0");
-  const m = String(Math.floor((d % 3600000) / 60000)).padStart(2, "0");
-  const s = String(Math.floor((d % 60000) / 1000)).padStart(2, "0");
-
-  hours.innerText = h;
-  minutes.innerText = m;
-  seconds.innerText = s;
-
-  document.querySelectorAll(".box")[0].querySelector(".label").innerText =
-    labelSingular(h, "Hour", "Hours");
-  document.querySelectorAll(".box")[1].querySelector(".label").innerText =
-    labelSingular(m, "Minute", "Minutes");
-  document.querySelectorAll(".box")[2].querySelector(".label").innerText =
-    labelSingular(s, "Second", "Seconds");
-
-  if (d <= 1800000) {
+  }else if(doorsRemaining <= 600000){
+    document.body.classList.add("red-alert");
+  }else if(doorsRemaining <= 1800000){
     document.body.classList.add("yellow-alert");
   }
 
-  if (d <= 600000) {
-    document.body.classList.remove("yellow-alert");
-    document.body.classList.add("red-alert");
-  }
+  const alerts = [
+    ...collectAlerts(doorsRemaining, triggeredDoors, "DOORS"),
+    ...collectAlerts(vipRemaining, triggeredVip, "VIP DOORS")
+  ];
 
-  for (const [a, label] of alertTimes) {
-    if (d <= a && !triggered[a]) {
-      triggered[a] = true;
-      showAlert(`${label} TO ${eventName}`);
-    }
+  if(alerts.length){
+    showAlert(alerts.join("\n"));
   }
 }
-  
+
 tick();
 
 setInterval(
   tick,
   1000
 );
+
+document.addEventListener("visibilitychange", () => {
+  if(!document.hidden){
+    tick();
+  }
+});
 
 </script>
 
