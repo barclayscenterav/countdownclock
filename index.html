@@ -154,7 +154,9 @@ if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
 
-/* 🧠 NORMALIZER */
+/* =========================
+   NORMALIZER (SAFE)
+========================= */
 function normalizeTeamName(input){
 
   return (input || "")
@@ -163,8 +165,21 @@ function normalizeTeamName(input){
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9\s]/g,"")
-    .replace(/\s+/g," ")
-    .trim();
+    .replace(/\s+/g," ");
+}
+
+/* =========================
+   ALIASES (FIXED)
+========================= */
+const teamAliases = {
+  "76ers":"sixers",
+  "philadelphia 76ers":"sixers",
+  "trailblazers":"blazers",
+  "trail blazers":"blazers"
+};
+
+function applyAlias(key){
+  return teamAliases[key] || key;
 }
 
 /* 🏀 NBA */
@@ -240,32 +255,18 @@ function parseMatchup(t){
     right:teams[1]
   };
 }
-const teamAliases = {
-  "76ers": "sixers",
-  "philadelphia 76ers": "sixers",
 
-  "trail blazers": "blazers",
-  "trailblazers": "blazers"
-};
-
-function applyAlias(key){
-  return teamAliases[key] || key;
-}
-/* 🔎 LOOKUP */
+/* 🔎 LOOKUP (FIXED ORDER) */
 function find(team){
 
   let key = normalizeTeamName(team);
-
   key = applyAlias(key);
-
-  // FINAL cleanup for lookup consistency
   key = key.replace(/\s/g,"");
 
   if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
   if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
 
   console.log("❌ NO MATCH:", team, "→", key);
-
   return null;
 }
 
@@ -311,6 +312,7 @@ targetTime.innerText = new Date(end).toLocaleString();
 
 apply();
 
+/* ⏱ LOOP */
 function tick(){
 
   const now = Date.now();
@@ -325,15 +327,15 @@ function tick(){
   minutes.innerText = m;
   seconds.innerText = s;
 
-  /* ✅ DYNAMIC LABELS */
+  /* dynamic labels */
   document.querySelectorAll(".box")[0].querySelector(".label").innerText =
-    labelSingular(h, "Hour", "Hours");
+    labelSingular(h,"Hour","Hours");
 
   document.querySelectorAll(".box")[1].querySelector(".label").innerText =
-    labelSingular(m, "Minute", "Minutes");
+    labelSingular(m,"Minute","Minutes");
 
   document.querySelectorAll(".box")[2].querySelector(".label").innerText =
-    labelSingular(s, "Second", "Seconds");
+    labelSingular(s,"Second","Seconds");
 
   if(d<=1800000) document.body.classList.add("yellow-alert");
 
