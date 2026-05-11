@@ -67,16 +67,9 @@ body.red-alert{
 h1{
   font-size:3rem;
   text-transform:uppercase;
-  margin:0 0 10px;
+  margin:0 0 20px;
 }
 
-#targetTime{
-  font-size:2.2rem;
-  color:#cbd5e1;
-  margin-bottom:10px;
-}
-
-/* countdown sections */
 .countdown-wrap{
   display:flex;
   flex-direction:column;
@@ -86,7 +79,7 @@ h1{
 .countdown-block{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
 }
 
 .countdown-title{
@@ -95,6 +88,12 @@ h1{
   text-transform:uppercase;
   letter-spacing:1px;
   color:#ffffff;
+}
+
+.target-time{
+  font-size:1.3rem;
+  color:#cbd5e1;
+  line-height:1.3;
 }
 
 .countdown{
@@ -176,7 +175,6 @@ h1{
   line-height:1.1;
 }
 
-/* flashing animation */
 @keyframes flashAlert{
   0%{
     opacity:1;
@@ -205,12 +203,12 @@ h1{
 
   <h1 id="title"></h1>
 
-  <div id="targetTime"></div>
-
   <div class="countdown-wrap">
 
     <div class="countdown-block">
       <div class="countdown-title">Doors</div>
+      <div id="doorsTargetTime" class="target-time"></div>
+
       <div class="countdown">
         <div class="box">
           <div id="doorsHours" class="number">00</div>
@@ -231,6 +229,8 @@ h1{
 
     <div class="countdown-block">
       <div class="countdown-title">VIP Doors</div>
+      <div id="vipTargetTime" class="target-time"></div>
+
       <div class="countdown">
         <div class="box">
           <div id="vipHours" class="number">00</div>
@@ -662,23 +662,31 @@ const eventDateDoors =
 const eventDateVip =
   new Date(vipEnd);
 
-/* top display */
-targetTime.innerText =
-  `Doors: ${eventDateDoors.toLocaleString(undefined, {
-    weekday:"long",
-    month:"long",
-    day:"numeric",
-    year:"numeric",
-    hour:"numeric",
-    minute:"2-digit"
-  })}   |   VIP Doors: ${eventDateVip.toLocaleString(undefined, {
-    weekday:"long",
-    month:"long",
-    day:"numeric",
-    year:"numeric",
-    hour:"numeric",
-    minute:"2-digit"
-  })}`;
+doorsTargetTime.innerText =
+  eventDateDoors.toLocaleString(
+    undefined,
+    {
+      weekday:"long",
+      month:"long",
+      day:"numeric",
+      year:"numeric",
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
+
+vipTargetTime.innerText =
+  eventDateVip.toLocaleString(
+    undefined,
+    {
+      weekday:"long",
+      month:"long",
+      day:"numeric",
+      year:"numeric",
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
 
 /* bottom display */
 function formatClock(){
@@ -754,12 +762,13 @@ function tick(){
 
   document.body.classList.remove("yellow-alert", "red-alert");
 
-  if(doorsRemaining <= 0){
-    document.body.classList.add("red-alert");
-  }else if(doorsRemaining <= 600000){
-    document.body.classList.add("red-alert");
-  }else if(doorsRemaining <= 1800000){
+  if(doorsRemaining <= 1800000){
     document.body.classList.add("yellow-alert");
+  }
+
+  if(doorsRemaining <= 600000){
+    document.body.classList.remove("yellow-alert");
+    document.body.classList.add("red-alert");
   }
 
   const alerts = [
