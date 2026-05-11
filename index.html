@@ -63,7 +63,10 @@ body.red-alert{
   max-width:900px;
 }
 
-h1{ font-size:3rem; }
+h1{
+  font-size:3rem;
+  text-transform:uppercase;
+}
 
 #targetTime{
   font-size:3rem;
@@ -83,14 +86,16 @@ h1{ font-size:3rem; }
   border-radius:20px;
 }
 
-.number{ font-size:5rem; }
+.number{
+  font-size:5rem;
+}
 
 .label{
   text-transform:uppercase;
   color:#cbd5e1;
 }
 
-/* alert */
+/* alert overlay */
 #alertOverlay{
   position:fixed;
   inset:0;
@@ -110,7 +115,7 @@ h1{ font-size:3rem; }
   animation:flashAlert 0.7s infinite;
 }
 
-/* flashing effect */
+/* flashing animation */
 @keyframes flashAlert{
 
   0%{
@@ -138,10 +143,13 @@ h1{ font-size:3rem; }
 <div class="bg-right" id="bgRight"></div>
 
 <div class="container">
+
   <h1 id="title"></h1>
+
   <div id="targetTime"></div>
 
   <div class="countdown">
+
     <div class="box">
       <div id="hours" class="number">00</div>
       <div class="label">Hours</div>
@@ -156,7 +164,9 @@ h1{ font-size:3rem; }
       <div id="seconds" class="number">00</div>
       <div class="label">Seconds</div>
     </div>
+
   </div>
+
 </div>
 
 <div id="alertOverlay">
@@ -165,25 +175,38 @@ h1{ font-size:3rem; }
 
 <script>
 
-const params = new URLSearchParams(location.search);
+/* =========================
+   URL PARAMS
+========================= */
 
-const titleRaw = params.get("title") || "";
-const eventName = params.get("event") || titleRaw;
-const end = params.get("end");
+const params =
+  new URLSearchParams(location.search);
+
+const titleRaw =
+  params.get("title") || "";
+
+const eventName =
+  params.get("event") || titleRaw;
+
+const end =
+  params.get("end");
 
 if(!titleRaw || !end){
-  document.body.innerHTML = "Invalid countdown link";
+
+  document.body.innerHTML =
+    "Invalid countdown link";
 }
 
 /* =========================
-   NORMALIZER (SAFE)
+   NORMALIZER
 ========================= */
+
 function normalizeTeamName(input){
 
   return (input || "")
     .toLowerCase()
     .trim()
-    .replace(/\s+/g," ")   // preserve words first
+    .replace(/\s+/g," ")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9\s]/g,"")
@@ -191,21 +214,29 @@ function normalizeTeamName(input){
 }
 
 /* =========================
-   ALIASES (FIXED)
+   ALIASES
 ========================= */
+
 const teamAliases = {
+
   "76ers":"sixers",
   "philadelphia 76ers":"sixers",
-  "trailblazers":"blazers",
-  "trail blazers":"blazers"
+
+  "trail blazers":"blazers",
+  "trailblazers":"blazers"
 };
 
 function applyAlias(key){
+
   return teamAliases[key] || key;
 }
 
-/* 🏀 NBA */
+/* =========================
+   NBA
+========================= */
+
 const nbaTeams = {
+
   hawks:{id:"1610612737"},
   celtics:{id:"1610612738"},
   hornets:{id:"1610612766"},
@@ -238,8 +269,12 @@ const nbaTeams = {
   nets:{id:"1610612751"}
 };
 
-/* 🏀 WNBA */
+/* =========================
+   WNBA
+========================= */
+
 const wnbaTeams = {
+
   aces:{id:"1611661319"},
   dream:{id:"1611661330"},
   fever:{id:"1611661325"},
@@ -257,82 +292,128 @@ const wnbaTeams = {
   fire:{id:"1611661327"}
 };
 
-/* 🧠 MATCHUP */
+/* =========================
+   MATCHUP PARSER
+========================= */
+
 function parseMatchup(t){
 
   const cleaned = (t || "")
     .replace(/\s+/g," ")
     .trim();
 
-  // MATCH: TEAM separator TEAM
   const match =
-    cleaned.match(/^(.+?)\s+(?:vs\.?|v\.?|@)\s+(.+)$/i);
+    cleaned.match(
+      /^(.+?)\s+(?:vs\.?|v\.?|@)\s+(.+)$/i
+    );
 
   if(!match) return null;
 
   return {
-    left: normalizeTeamName(match[1]),
-    right: normalizeTeamName(match[2])
+
+    left:
+      normalizeTeamName(match[1]),
+
+    right:
+      normalizeTeamName(match[2])
   };
 }
-  
-function logLookup(stage, value){
-  console.log(`[${stage}]`, value);
-}
-/* 🔎 LOOKUP (FIXED ORDER) */
+
+/* =========================
+   LOOKUP
+========================= */
+
 function find(team){
 
-  logLookup("INPUT", team);
+  let key =
+    normalizeTeamName(team);
 
-  let key = normalizeTeamName(team);
-  logLookup("NORMALIZED", key);
+  key =
+    applyAlias(key);
 
-  key = applyAlias(key);
-  logLookup("AFTER_ALIAS", key);
+  key =
+    key.replace(/\s/g,"");
 
-  let nbaKey = key.replace(/\s/g,"");
-  logLookup("NBA_KEY", nbaKey);
+  if(nbaTeams[key]){
 
-  if(nbaTeams[nbaKey]){
-    logLookup("NBA_MATCH", nbaTeams[nbaKey]);
-    return {league:"nba", ...nbaTeams[nbaKey]};
+    return {
+      league:"nba",
+      ...nbaTeams[key]
+    };
   }
 
-  let wnbaKey = key.replace(/\s/g,"");
-  logLookup("WNBA_KEY", wnbaKey);
+  if(wnbaTeams[key]){
 
-  if(wnbaTeams[wnbaKey]){
-    logLookup("WNBA_MATCH", wnbaTeams[wnbaKey]);
-    return {league:"wnba", ...wnbaTeams[wnbaKey]};
+    return {
+      league:"wnba",
+      ...wnbaTeams[key]
+    };
   }
 
-  logLookup("NO_MATCH", team);
+  console.log("NO MATCH:", key);
+
   return null;
 }
 
-/* 🖼 LOGO */
-function logo(t){
-  if(!t) return null;
+/* =========================
+   LOGO URL
+========================= */
 
-  return t.league==="nba"
-    ? `https://cdn.nba.com/logos/nba/${t.id}/primary/D/logo.svg`
-    : `https://cdn.wnba.com/logos/wnba/${t.id}/primary/D/logo.svg`;
+function logo(team){
+
+  if(!team) return null;
+
+  return team.league === "nba"
+
+    ? `https://cdn.nba.com/logos/nba/${team.id}/primary/D/logo.svg`
+
+    : `https://cdn.wnba.com/logos/wnba/${team.id}/primary/D/logo.svg`;
 }
 
-/* 🏟 APPLY */
+/* =========================
+   APPLY LOGOS
+========================= */
+
 function apply(){
-  const m = parseMatchup(titleRaw);
-  if(!m) return;
 
-  const l = logo(find(m.left));
-  const r = logo(find(m.right));
+  const matchup =
+    parseMatchup(titleRaw);
 
-  if(l) bgLeft.style.backgroundImage = `url(${l})`;
-  if(r) bgRight.style.backgroundImage = `url(${r})`;
+  console.log("MATCHUP:", matchup);
+
+  if(!matchup) return;
+
+  const leftTeam =
+    find(matchup.left);
+
+  const rightTeam =
+    find(matchup.right);
+
+  console.log("LEFT TEAM:", leftTeam);
+  console.log("RIGHT TEAM:", rightTeam);
+
+  const leftLogo =
+    logo(leftTeam);
+
+  const rightLogo =
+    logo(rightTeam);
+
+  if(leftLogo){
+
+    bgLeft.style.backgroundImage =
+      `url(${leftLogo})`;
+  }
+
+  if(rightLogo){
+
+    bgRight.style.backgroundImage =
+      `url(${rightLogo})`;
+  }
 }
 
-/* ⏰ ALERT */
-let triggered={3600000:false,1800000:false,900000:false,600000:false,300000:false};
+/* =========================
+   ALERT SYSTEM
+========================= */
 
 function showAlert(text){
 
@@ -340,7 +421,6 @@ function showAlert(text){
 
   alertOverlay.style.display = "flex";
 
-  // auto close after 10 seconds
   setTimeout(() => {
 
     alertOverlay.style.display = "none";
@@ -348,68 +428,171 @@ function showAlert(text){
   }, 10000);
 }
 
-/* 🟡 PLURAL FIX */
-function labelSingular(value, singular, plural){
-  return Number(value) === 1 ? singular : plural;
+const target =
+  new Date(end).getTime();
+
+/* alert times */
+const alertTimes = [
+
+  [3600000,"1 HOUR"],
+  [1800000,"30 MINUTES"],
+  [900000,"15 MINUTES"],
+  [600000,"10 MINUTES"],
+  [300000,"5 MINUTES"]
+];
+
+let triggered = {};
+
+/* refresh-safe init */
+(function initTriggered(){
+
+  const now =
+    Date.now();
+
+  const remaining =
+    target - now;
+
+  for(const [time] of alertTimes){
+
+    triggered[time] =
+      remaining <= time;
+  }
+
+})();
+
+/* =========================
+   LABEL FIX
+========================= */
+
+function labelSingular(
+  value,
+  singular,
+  plural
+){
+
+  return Number(value) === 1
+    ? singular
+    : plural;
 }
 
-const target = new Date(end).getTime();
+/* =========================
+   INIT
+========================= */
 
-title.innerText = titleRaw;
-targetTime.innerText = new Date(end).toLocaleString();
+title.innerText =
+  titleRaw.toUpperCase();
+
+targetTime.innerText =
+  new Date(end).toLocaleString();
 
 apply();
 
-/* ⏱ LOOP */
+/* =========================
+   LOOP
+========================= */
+
 function tick(){
 
-  const now = Date.now();
-  const d = target - now;
+  const now =
+    Date.now();
+
+  const d =
+    target - now;
+
   if(d <= 0) return;
 
-  const h = String(Math.floor(d/3600000)).padStart(2,"0");
-  const m = String(Math.floor((d%3600000)/60000)).padStart(2,"0");
-  const s = String(Math.floor((d%60000)/1000)).padStart(2,"0");
+  const h =
+    String(
+      Math.floor(d/3600000)
+    ).padStart(2,"0");
+
+  const m =
+    String(
+      Math.floor((d%3600000)/60000)
+    ).padStart(2,"0");
+
+  const s =
+    String(
+      Math.floor((d%60000)/1000)
+    ).padStart(2,"0");
 
   hours.innerText = h;
   minutes.innerText = m;
   seconds.innerText = s;
 
-  /* dynamic labels */
-  document.querySelectorAll(".box")[0].querySelector(".label").innerText =
-    labelSingular(h,"Hour","Hours");
+  /* singular labels */
 
-  document.querySelectorAll(".box")[1].querySelector(".label").innerText =
-    labelSingular(m,"Minute","Minutes");
+  document
+    .querySelectorAll(".box")[0]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        h,
+        "Hour",
+        "Hours"
+      );
 
-  document.querySelectorAll(".box")[2].querySelector(".label").innerText =
-    labelSingular(s,"Second","Seconds");
+  document
+    .querySelectorAll(".box")[1]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        m,
+        "Minute",
+        "Minutes"
+      );
 
-  if(d<=1800000) document.body.classList.add("yellow-alert");
+  document
+    .querySelectorAll(".box")[2]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        s,
+        "Second",
+        "Seconds"
+      );
 
-  if(d<=300000){
-    document.body.classList.remove("yellow-alert");
-    document.body.classList.add("red-alert");
+  /* color states */
+
+  if(d <= 1800000){
+
+    document.body.classList.add(
+      "yellow-alert"
+    );
   }
 
-  const alerts=[
-    [3600000,"1 HOUR"],
-    [1800000,"30 MINUTES"],
-    [900000,"15 MINUTES"],
-    [600000,"10 MINUTES"],
-    [300000,"5 MINUTES"]
-  ];
+  if(d <= 300000){
 
-  for(const[a,label]of alerts){
-    if(d<=a && !triggered[a]){
-      triggered[a]=true;
-      showAlert(`${label} TO ${eventName}`);
+    document.body.classList.remove(
+      "yellow-alert"
+    );
+
+    document.body.classList.add(
+      "red-alert"
+    );
+  }
+
+  /* alerts */
+
+  for(const [a,label] of alertTimes){
+
+    if(d <= a && !triggered[a]){
+
+      triggered[a] = true;
+
+      showAlert(
+        `${label} TO ${eventName}`
+      );
     }
   }
 }
 
 tick();
-setInterval(tick,1000);
+
+setInterval(
+  tick,
+  1000
+);
 
 </script>
 
