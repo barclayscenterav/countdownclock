@@ -106,6 +106,27 @@ h1{ font-size:3rem; }
   font-weight:900;
   color:red;
   text-transform:uppercase;
+
+  animation:flashAlert 0.7s infinite;
+}
+
+/* flashing effect */
+@keyframes flashAlert{
+
+  0%{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  50%{
+    opacity:0.25;
+    transform:scale(1.08);
+  }
+
+  100%{
+    opacity:1;
+    transform:scale(1);
+  }
 }
 
 </style>
@@ -314,9 +335,17 @@ function apply(){
 let triggered={3600000:false,1800000:false,900000:false,600000:false,300000:false};
 
 function showAlert(text){
-  alertBox.innerText=text;
-  alertOverlay.style.display="flex";
-  setTimeout(()=>alertOverlay.style.display="none",15000);
+
+  alertBox.innerText = text;
+
+  alertOverlay.style.display = "flex";
+
+  // auto close after 10 seconds
+  setTimeout(() => {
+
+    alertOverlay.style.display = "none";
+
+  }, 10000);
 }
 
 /* 🟡 PLURAL FIX */
