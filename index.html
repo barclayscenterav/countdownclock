@@ -35,10 +35,15 @@ body{
   pointer-events:none;
 }
 
-.bg-left{ left:0; }
-.bg-right{ right:0; }
+.bg-left{
+  left:0;
+}
 
-/* overlay */
+.bg-right{
+  right:0;
+}
+
+/* dark overlay */
 body::before{
   content:"";
   position:fixed;
@@ -47,15 +52,7 @@ body::before{
   z-index:0;
 }
 
-/* alert states */
-body.yellow-alert{
-  background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
-}
-
-body.red-alert{
-  background:linear-gradient(135deg,#3b0000,#7f0000) !important;
-}
-
+/* main container */
 .container{
   position:relative;
   z-index:2;
@@ -70,6 +67,7 @@ h1{
   margin:0 0 20px;
 }
 
+/* countdown sections */
 .countdown-wrap{
   display:flex;
   flex-direction:column;
@@ -106,15 +104,40 @@ h1{
   background:rgba(255,255,255,0.1);
   padding:30px;
   border-radius:20px;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    border 0.3s ease;
+  border:3px solid transparent;
 }
 
 .number{
   font-size:5rem;
+  font-weight:700;
 }
 
 .label{
   text-transform:uppercase;
   color:#cbd5e1;
+}
+
+/* independent yellow state */
+.countdown-block.state-yellow .box{
+  background:rgba(234,179,8,0.45);
+  border-color:#eab308;
+  box-shadow:0 0 28px rgba(234,179,8,0.65);
+}
+
+/* independent red state */
+.countdown-block.state-red .box{
+  background:rgba(220,38,38,0.55);
+  border-color:#ef4444;
+  box-shadow:0 0 32px rgba(220,38,38,0.8);
+}
+
+.countdown-block.state-red .label,
+.countdown-block.state-yellow .label{
+  color:white;
 }
 
 /* bottom clock */
@@ -140,18 +163,14 @@ h1{
   animation:flashDot 1s infinite;
 }
 
-.tod-label{
-  margin-right:12px;
-}
-
-.tod-clock{
-  display:inline-flex;
-  align-items:center;
-}
-
 @keyframes flashDot{
-  0%,100%{opacity:1;}
-  50%{opacity:0.2;}
+  0%,100%{
+    opacity:1;
+  }
+
+  50%{
+    opacity:0.2;
+  }
 }
 
 /* alert overlay */
@@ -172,7 +191,7 @@ h1{
   text-transform:uppercase;
   animation:flashAlert 0.7s infinite;
   white-space:pre-line;
-  line-height:1.1;
+  line-height:1.15;
 }
 
 @keyframes flashAlert{
@@ -205,11 +224,17 @@ h1{
 
   <div class="countdown-wrap">
 
-    <div class="countdown-block">
-      <div class="countdown-title">Doors</div>
+    <!-- DOORS COUNTDOWN -->
+    <div class="countdown-block" id="doorsBlock">
+
+      <div class="countdown-title">
+        Doors
+      </div>
+
       <div id="doorsTargetTime" class="target-time"></div>
 
       <div class="countdown">
+
         <div class="box">
           <div id="doorsHours" class="number">00</div>
           <div id="doorsHoursLabel" class="label">Hours</div>
@@ -224,14 +249,22 @@ h1{
           <div id="doorsSeconds" class="number">00</div>
           <div id="doorsSecondsLabel" class="label">Seconds</div>
         </div>
+
       </div>
+
     </div>
 
-    <div class="countdown-block">
-      <div class="countdown-title">VIP Doors</div>
+    <!-- VIP DOORS COUNTDOWN -->
+    <div class="countdown-block" id="vipBlock">
+
+      <div class="countdown-title">
+        VIP Doors
+      </div>
+
       <div id="vipTargetTime" class="target-time"></div>
 
       <div class="countdown">
+
         <div class="box">
           <div id="vipHours" class="number">00</div>
           <div id="vipHoursLabel" class="label">Hours</div>
@@ -246,10 +279,13 @@ h1{
           <div id="vipSeconds" class="number">00</div>
           <div id="vipSecondsLabel" class="label">Seconds</div>
         </div>
+
       </div>
+
     </div>
 
   </div>
+
 </div>
 
 <div id="timeOfDay"></div>
@@ -259,6 +295,40 @@ h1{
 </div>
 
 <script>
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const titleEl =
+  document.getElementById("title");
+
+const bgLeft =
+  document.getElementById("bgLeft");
+
+const bgRight =
+  document.getElementById("bgRight");
+
+const doorsBlock =
+  document.getElementById("doorsBlock");
+
+const vipBlock =
+  document.getElementById("vipBlock");
+
+const doorsTargetTime =
+  document.getElementById("doorsTargetTime");
+
+const vipTargetTime =
+  document.getElementById("vipTargetTime");
+
+const timeOfDay =
+  document.getElementById("timeOfDay");
+
+const alertOverlay =
+  document.getElementById("alertOverlay");
+
+const alertBox =
+  document.getElementById("alertBox");
 
 /* =========================
    URL PARAMS
@@ -271,10 +341,10 @@ const titleRaw =
   params.get("title") || "";
 
 const doorsEnd =
-  params.get("doorsEnd");
+  params.get("doorsEnd") || params.get("end");
 
 const vipEnd =
-  params.get("vipEnd");
+  params.get("vipEnd") || params.get("end");
 
 if(!titleRaw || !doorsEnd || !vipEnd){
 
@@ -290,12 +360,15 @@ const doorsTarget =
 const vipTarget =
   new Date(vipEnd).getTime();
 
-if(Number.isNaN(doorsTarget) || Number.isNaN(vipTarget)){
+if(
+  Number.isNaN(doorsTarget) ||
+  Number.isNaN(vipTarget)
+){
 
   document.body.innerHTML =
     "Invalid countdown date";
 
-  throw new Error("Invalid date values");
+  throw new Error("Invalid countdown date");
 }
 
 /* =========================
@@ -397,10 +470,14 @@ const wnbaTeams = {
    SMART MATCHUP PARSER
 ========================= */
 
-function parseMatchup(title) {
-  const normalized = normalizeTeamName(title).replace(/\s/g, "");
+function parseMatchup(title){
+
+  const normalized =
+    normalizeTeamName(title)
+      .replace(/\s/g,"");
 
   const allTeams = [
+
     ...Object.keys(nbaTeams),
     ...Object.keys(wnbaTeams),
     ...Object.keys(teamAliases)
@@ -408,41 +485,59 @@ function parseMatchup(title) {
 
   const matches = [];
 
-  for (const team of allTeams) {
-    const normalizedTeam = team.replace(/\s/g, "");
-    const index = normalized.indexOf(normalizedTeam);
+  for(const team of allTeams){
 
-    if (index !== -1) {
+    const normalizedTeam =
+      team.replace(/\s/g,"");
+
+    const index =
+      normalized.indexOf(normalizedTeam);
+
+    if(index !== -1){
+
       matches.push({
-        team: applyAlias(team),
-        index,
-        length: normalizedTeam.length
+        team:applyAlias(team),
+        index:index,
+        length:normalizedTeam.length
       });
     }
   }
 
-  if (matches.length < 2) return null;
-
-  matches.sort((a, b) => a.index - b.index || b.length - a.length);
-
-  const unique = [];
-  for (const match of matches) {
-    if (!unique.includes(match.team)) {
-      unique.push(match.team);
-    }
-    if (unique.length === 2) break;
+  if(matches.length < 2){
+    return null;
   }
 
-  if (unique.length < 2) return null;
+  matches.sort(
+    (a,b) =>
+      a.index - b.index ||
+      b.length - a.length
+  );
+
+  const unique = [];
+
+  for(const match of matches){
+
+    if(!unique.includes(match.team)){
+      unique.push(match.team);
+    }
+
+    if(unique.length === 2){
+      break;
+    }
+  }
+
+  if(unique.length < 2){
+    return null;
+  }
 
   return {
-    left: unique[0],
-    right: unique[1]
+    left:unique[0],
+    right:unique[1]
   };
 }
 
 /* =========================
-   LOOKUP
+   TEAM LOOKUP
 ========================= */
 
 function find(team){
@@ -472,8 +567,6 @@ function find(team){
     };
   }
 
-  console.log("NO MATCH:", key);
-
   return null;
 }
 
@@ -483,27 +576,30 @@ function find(team){
 
 function logo(team){
 
-  if(!team) return null;
+  if(!team){
+    return null;
+  }
 
-  return team.league === "nba"
+  if(team.league === "nba"){
 
-    ? `https://cdn.nba.com/logos/nba/${team.id}/primary/D/logo.svg`
+    return `https://cdn.nba.com/logos/nba/${team.id}/primary/D/logo.svg`;
+  }
 
-    : `https://cdn.wnba.com/logos/wnba/${team.id}/primary/D/logo.svg`;
+  return `https://cdn.wnba.com/logos/wnba/${team.id}/primary/D/logo.svg`;
 }
 
 /* =========================
    APPLY LOGOS
 ========================= */
 
-function apply(){
+function applyLogos(){
 
   const matchup =
     parseMatchup(titleRaw);
 
-  console.log("MATCHUP:", matchup);
-
-  if(!matchup) return;
+  if(!matchup){
+    return;
+  }
 
   const leftTeam =
     find(matchup.left);
@@ -518,11 +614,13 @@ function apply(){
     logo(rightTeam);
 
   if(leftLogo){
+
     bgLeft.style.backgroundImage =
       `url(${leftLogo})`;
   }
 
   if(rightLogo){
+
     bgRight.style.backgroundImage =
       `url(${rightLogo})`;
   }
@@ -531,16 +629,6 @@ function apply(){
 /* =========================
    ALERT SYSTEM
 ========================= */
-
-function showAlert(text){
-
-  alertBox.innerText = text;
-  alertOverlay.style.display = "flex";
-
-  setTimeout(() => {
-    alertOverlay.style.display = "none";
-  }, 10000);
-}
 
 const alertTimes = [
 
@@ -553,6 +641,28 @@ const alertTimes = [
 
 let triggeredDoors = {};
 let triggeredVip = {};
+let alertTimeout = null;
+
+function showAlert(text){
+
+  if(alertTimeout){
+    clearTimeout(alertTimeout);
+  }
+
+  alertBox.innerText =
+    text;
+
+  alertOverlay.style.display =
+    "flex";
+
+  alertTimeout =
+    setTimeout(() => {
+
+      alertOverlay.style.display =
+        "none";
+
+    }, 10000);
+}
 
 /* refresh-safe init */
 (function initTriggered(){
@@ -577,20 +687,47 @@ let triggeredVip = {};
 
 })();
 
-/* =========================
-   LABEL FIX
-========================= */
+function collectAlerts(
+  remaining,
+  triggeredMap,
+  suffix
+){
 
-function labelSingular(value, singular, plural){
+  const messages = [];
 
-  return Number(value) === 1
-    ? singular
-    : plural;
+  for(const [threshold,label] of alertTimes){
+
+    if(
+      remaining <= threshold &&
+      !triggeredMap[threshold]
+    ){
+
+      triggeredMap[threshold] =
+        true;
+
+      messages.push(
+        `${label} TO ${suffix}`
+      );
+    }
+  }
+
+  return messages;
 }
 
 /* =========================
    COUNTDOWN HELPERS
 ========================= */
+
+function labelSingular(
+  value,
+  singular,
+  plural
+){
+
+  return Number(value) === 1
+    ? singular
+    : plural;
+}
 
 function getCountdownParts(ms){
 
@@ -607,53 +744,77 @@ function getCountdownParts(ms){
     Math.floor((safe % 60000) / 1000);
 
   return {
-    hNum,
-    mNum,
-    sNum,
-    h: String(hNum).padStart(2,"0"),
-    m: String(mNum).padStart(2,"0"),
-    s: String(sNum).padStart(2,"0")
+    hNum:hNum,
+    mNum:mNum,
+    sNum:sNum,
+    h:String(hNum).padStart(2,"0"),
+    m:String(mNum).padStart(2,"0"),
+    s:String(sNum).padStart(2,"0")
   };
 }
 
 function renderBlock(prefix, parts){
 
-  document.getElementById(`${prefix}Hours`).innerText = parts.h;
-  document.getElementById(`${prefix}Minutes`).innerText = parts.m;
-  document.getElementById(`${prefix}Seconds`).innerText = parts.s;
+  document.getElementById(`${prefix}Hours`).innerText =
+    parts.h;
+
+  document.getElementById(`${prefix}Minutes`).innerText =
+    parts.m;
+
+  document.getElementById(`${prefix}Seconds`).innerText =
+    parts.s;
 
   document.getElementById(`${prefix}HoursLabel`).innerText =
-    labelSingular(parts.hNum, "Hour", "Hours");
+    labelSingular(
+      parts.hNum,
+      "Hour",
+      "Hours"
+    );
 
   document.getElementById(`${prefix}MinutesLabel`).innerText =
-    labelSingular(parts.mNum, "Minute", "Minutes");
+    labelSingular(
+      parts.mNum,
+      "Minute",
+      "Minutes"
+    );
 
   document.getElementById(`${prefix}SecondsLabel`).innerText =
-    labelSingular(parts.sNum, "Second", "Seconds");
+    labelSingular(
+      parts.sNum,
+      "Second",
+      "Seconds"
+    );
 }
 
-function collectAlerts(remaining, triggeredMap, suffix){
+function setCountdownBoxState(block, remaining){
 
-  const messages = [];
+  block.classList.remove(
+    "state-yellow",
+    "state-red"
+  );
 
-  for(const [threshold, label] of alertTimes){
+  if(remaining <= 600000){
 
-    if(remaining <= threshold && !triggeredMap[threshold]){
+    block.classList.add(
+      "state-red"
+    );
 
-      triggeredMap[threshold] = true;
-
-      messages.push(`${label} TO ${suffix}`);
-    }
+    return;
   }
 
-  return messages;
+  if(remaining <= 1800000){
+
+    block.classList.add(
+      "state-yellow"
+    );
+  }
 }
 
 /* =========================
    INIT
 ========================= */
 
-title.innerText =
+titleEl.innerText =
   titleRaw.toUpperCase();
 
 const eventDateDoors =
@@ -688,62 +849,114 @@ vipTargetTime.innerText =
     }
   );
 
-/* bottom display */
+applyLogos();
+
+/* =========================
+   BOTTOM CLOCK
+========================= */
+
 function formatClock(){
 
-  const now = new Date();
+  const now =
+    new Date();
 
-  let h = now.getHours();
-  const m = String(now.getMinutes()).padStart(2,"0");
-  const s = String(now.getSeconds()).padStart(2,"0");
+  let h =
+    now.getHours();
 
-  const ampm = h >= 12 ? "PM" : "AM";
-  h = h % 12;
-  h = h ? h : 12;
+  const m =
+    String(now.getMinutes())
+      .padStart(2,"0");
 
-  return { h, m, s, ampm };
+  const s =
+    String(now.getSeconds())
+      .padStart(2,"0");
+
+  const ampm =
+    h >= 12 ? "PM" : "AM";
+
+  h =
+    h % 12;
+
+  h =
+    h ? h : 12;
+
+  return {
+    h:h,
+    m:m,
+    s:s,
+    ampm:ampm
+  };
 }
 
 function renderClock(){
 
-  const t = formatClock();
+  const t =
+    formatClock();
 
-  const label = document.createElement("span");
-  label.textContent = "TIME OF DAY:";
+  const label =
+    document.createElement("span");
 
-  const clock = document.createElement("span");
-  clock.style.display = "inline-flex";
-  clock.style.alignItems = "center";
-  clock.style.gap = "0px";
+  label.textContent =
+    "TIME OF DAY:";
 
-  clock.innerHTML = `
-    <span>${t.h}</span><span class="time-dot">:</span>
-    <span>${t.m}</span><span class="time-dot">:</span>
-    <span>${t.s}</span><span>${t.ampm}</span>
-  `;
+  const clock =
+    document.createElement("span");
 
-  timeOfDay.innerHTML = "";
-  timeOfDay.style.display = "flex";
-  timeOfDay.style.justifyContent = "center";
-  timeOfDay.style.alignItems = "center";
-  timeOfDay.style.gap = "8px";
+  clock.style.display =
+    "inline-flex";
 
-  timeOfDay.appendChild(label);
-  timeOfDay.appendChild(clock);
+  clock.style.alignItems =
+    "center";
+
+  clock.style.gap =
+    "0px";
+
+  clock.innerHTML =
+    `
+      <span>${t.h}</span><span class="time-dot">:</span>
+      <span>${t.m}</span><span class="time-dot">:</span>
+      <span>${t.s}</span><span>${t.ampm}</span>
+    `;
+
+  timeOfDay.innerHTML =
+    "";
+
+  timeOfDay.style.display =
+    "flex";
+
+  timeOfDay.style.justifyContent =
+    "center";
+
+  timeOfDay.style.alignItems =
+    "center";
+
+  timeOfDay.style.gap =
+    "8px";
+
+  timeOfDay.appendChild(
+    label
+  );
+
+  timeOfDay.appendChild(
+    clock
+  );
 }
 
 renderClock();
-setInterval(renderClock, 1000);
 
-apply();
+setInterval(
+  renderClock,
+  1000
+);
 
 /* =========================
-   LOOP
+   MAIN LOOP
 ========================= */
 
 function tick(){
 
-  const now = Date.now();
+  const now =
+    Date.now();
 
   const doorsRemaining =
     doorsTarget - now;
@@ -752,32 +965,53 @@ function tick(){
     vipTarget - now;
 
   const doorsParts =
-    getCountdownParts(doorsRemaining);
+    getCountdownParts(
+      doorsRemaining
+    );
 
   const vipParts =
-    getCountdownParts(vipRemaining);
+    getCountdownParts(
+      vipRemaining
+    );
 
-  renderBlock("doors", doorsParts);
-  renderBlock("vip", vipParts);
+  renderBlock(
+    "doors",
+    doorsParts
+  );
 
-  document.body.classList.remove("yellow-alert", "red-alert");
+  renderBlock(
+    "vip",
+    vipParts
+  );
 
-  if(doorsRemaining <= 1800000){
-    document.body.classList.add("yellow-alert");
-  }
+  setCountdownBoxState(
+    doorsBlock,
+    doorsRemaining
+  );
 
-  if(doorsRemaining <= 600000){
-    document.body.classList.remove("yellow-alert");
-    document.body.classList.add("red-alert");
-  }
+  setCountdownBoxState(
+    vipBlock,
+    vipRemaining
+  );
 
   const alerts = [
-    ...collectAlerts(doorsRemaining, triggeredDoors, "DOORS"),
-    ...collectAlerts(vipRemaining, triggeredVip, "VIP DOORS")
+    ...collectAlerts(
+      doorsRemaining,
+      triggeredDoors,
+      "DOORS"
+    ),
+    ...collectAlerts(
+      vipRemaining,
+      triggeredVip,
+      "VIP DOORS"
+    )
   ];
 
   if(alerts.length){
-    showAlert(alerts.join("\n"));
+
+    showAlert(
+      alerts.join("\n")
+    );
   }
 }
 
@@ -788,11 +1022,15 @@ setInterval(
   1000
 );
 
-document.addEventListener("visibilitychange", () => {
-  if(!document.hidden){
-    tick();
+document.addEventListener(
+  "visibilitychange",
+  () => {
+
+    if(!document.hidden){
+      tick();
+    }
   }
-});
+);
 
 </script>
 
