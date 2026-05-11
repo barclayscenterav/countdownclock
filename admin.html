@@ -5,6 +5,7 @@
 <title>Admin</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -17,40 +18,54 @@ body{
   min-height:100vh;
   display:grid;
   place-items:center;
+  padding:20px;
 }
 
 .box{
   width:500px;
-  max-width:calc(100vw - 24px);
+  max-width:100%;
   background:#1e293b;
   padding:30px;
   border-radius:14px;
+
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:18px;
 }
 
 h2{
   margin:0;
   text-align:center;
+  font-size:2rem;
+}
+
+/* form groups */
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
 label{
-  font-size:14px;
+  font-size:15px;
   color:#cbd5e1;
-  margin-bottom:-8px;
-  display:block;
+  font-weight:600;
 }
 
 input{
   width:100%;
-  padding:12px;
+  padding:14px;
   border:none;
   border-radius:8px;
   font-size:16px;
   outline:none;
   text-align:center;
+  background:white;
+  color:#0f172a;
 }
+
+/* button */
 
 button{
   width:100%;
@@ -62,11 +77,14 @@ button{
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
+  transition:0.2s;
 }
 
 button:hover{
   background:#2563eb;
 }
+
+/* preview card */
 
 .preview{
   background:#0f172a;
@@ -79,14 +97,16 @@ button:hover{
   color:#94a3b8;
   margin-bottom:8px;
   text-transform:uppercase;
+  font-weight:bold;
 }
 
 #urlPreview{
   word-break:break-all;
   color:#38bdf8;
   font-size:14px;
-  line-height:1.4;
+  line-height:1.5;
 }
+
 </style>
 </head>
 
@@ -96,35 +116,61 @@ button:hover{
 
   <h2>Create Countdown</h2>
 
-  <div>
-    <label for="title">Title</label>
+  <!-- TITLE -->
+
+  <div class="field">
+
+    <label for="title">
+      Matchup Title
+    </label>
+
     <input
       id="title"
-      placeholder="Title (e.g. Fever vs Valkyries)"
+      placeholder="e.g. Fever vs Valkyries"
     >
+
   </div>
 
-  <div>
-    <label for="doorsEnd">Doors Time</label>
+  <!-- DOORS -->
+
+  <div class="field">
+
+    <label for="doorsEnd">
+      Doors Time
+    </label>
+
     <input
       id="doorsEnd"
       type="datetime-local"
     >
+
   </div>
 
-  <div>
-    <label for="vipEnd">VIP Doors Time</label>
+  <!-- VIP DOORS -->
+
+  <div class="field">
+
+    <label for="vipEnd">
+      VIP Doors Time
+    </label>
+
     <input
       id="vipEnd"
       type="datetime-local"
     >
+
   </div>
+
+  <!-- BUTTON -->
 
   <button onclick="copyURL()">
     Copy URL
   </button>
 
+  <!-- URL PREVIEW -->
+
   <div class="preview">
+
     <div class="preview-title">
       Live URL
     </div>
@@ -132,11 +178,16 @@ button:hover{
     <div id="urlPreview">
       Waiting for input...
     </div>
+
   </div>
 
 </div>
 
 <script>
+
+/* =========================
+   ELEMENTS
+========================= */
 
 const titleInput =
   document.getElementById("title");
@@ -149,6 +200,10 @@ const vipEndInput =
 
 const urlPreview =
   document.getElementById("urlPreview");
+
+/* =========================
+   URL BUILDER
+========================= */
 
 function buildURL(){
 
@@ -165,14 +220,30 @@ function buildURL(){
     window.location.origin +
     "/countdownclock/index";
 
-  const url = new URL(base);
+  const url =
+    new URL(base);
 
-  url.searchParams.set("title", title);
-  url.searchParams.set("doorsEnd", doorsEnd);
-  url.searchParams.set("vipEnd", vipEnd);
+  url.searchParams.set(
+    "title",
+    title
+  );
+
+  url.searchParams.set(
+    "doorsEnd",
+    doorsEnd
+  );
+
+  url.searchParams.set(
+    "vipEnd",
+    vipEnd
+  );
 
   return url.toString();
 }
+
+/* =========================
+   LIVE PREVIEW
+========================= */
 
 function updatePreview(){
 
@@ -185,9 +256,15 @@ function updatePreview(){
   const vipEnd =
     vipEndInput.value.trim();
 
-  if(!title || !doorsEnd || !vipEnd){
+  if(
+    !title ||
+    !doorsEnd ||
+    !vipEnd
+  ){
+
     urlPreview.innerText =
       "Waiting for input...";
+
     return;
   }
 
@@ -195,22 +272,75 @@ function updatePreview(){
     buildURL();
 }
 
+/* =========================
+   COPY URL
+========================= */
+
 async function copyURL(){
+
+  const title =
+    titleInput.value.trim();
+
+  const doorsEnd =
+    doorsEndInput.value.trim();
+
+  const vipEnd =
+    vipEndInput.value.trim();
+
+  if(
+    !title ||
+    !doorsEnd ||
+    !vipEnd
+  ){
+
+    alert(
+      "Please complete all fields."
+    );
+
+    return;
+  }
 
   const url =
     buildURL();
 
   try{
-    await navigator.clipboard.writeText(url);
-    alert("URL copied!");
+
+    await navigator.clipboard.writeText(
+      url
+    );
+
+    alert(
+      "URL copied!"
+    );
+
   }catch(err){
-    alert("Copy failed. Please copy manually.");
+
+    alert(
+      "Copy failed. Please copy manually."
+    );
   }
 }
 
-titleInput.addEventListener("input", updatePreview);
-doorsEndInput.addEventListener("input", updatePreview);
-vipEndInput.addEventListener("input", updatePreview);
+/* =========================
+   LISTENERS
+========================= */
+
+titleInput.addEventListener(
+  "input",
+  updatePreview
+);
+
+doorsEndInput.addEventListener(
+  "input",
+  updatePreview
+);
+
+vipEndInput.addEventListener(
+  "input",
+  updatePreview
+);
+
+/* initial */
 
 updatePreview();
 
