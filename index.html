@@ -75,18 +75,29 @@ h1{
 }
 
 /* bottom time display */
-#eventTime{
+#timeOfDay{
   position:fixed;
   bottom:25px;
   left:50%;
   transform:translateX(-50%);
 
-  font-size:2rem;
-  font-weight:bold;
+  font-size:1.8rem;
+  font-weight:800;
   letter-spacing:2px;
   color:#ffffff;
 
   z-index:2;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.time-dot{
+  animation:flashDot 1s infinite;
+}
+
+@keyframes flashDot{
+  0%,100%{opacity:1;}
+  50%{opacity:0.2;}
 }
 
 .countdown{
@@ -184,7 +195,7 @@ h1{
 
 </div>
 
-<div id="eventTime"></div>
+<div id="timeOfDay"></div>
 
 <div id="alertOverlay">
   <div id="alertBox"></div>
@@ -535,14 +546,36 @@ targetTime.innerText =
   );
 
 /* bottom display */
-eventTime.innerText =
-  eventDate.toLocaleTimeString(
-    undefined,
-    {
-      hour:"numeric",
-      minute:"2-digit"
-    }
-  );
+function formatClock(){
+
+  const now = new Date();
+
+  let h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2,"0");
+  const s = String(now.getSeconds()).padStart(2,"0");
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  h = h ? h : 12;
+
+  return { h, m, s, ampm };
+}
+
+function renderClock(){
+
+  const t = formatClock();
+
+  timeOfDay.innerHTML = `
+    TIME OF DAY:
+    <span>${t.h}</span><span class="time-dot">:</span>
+    <span>${t.m}</span><span class="time-dot">:</span>
+    <span>${t.s}</span>
+    <span>${t.ampm}</span>
+  `;
+}
+
+renderClock();
+setInterval(renderClock, 1000);
 
 apply();
 
