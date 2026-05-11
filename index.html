@@ -21,7 +21,7 @@ body{
   position:relative;
 }
 
-/* split logos */
+/* backgrounds */
 .bg-left,
 .bg-right{
   position:fixed;
@@ -31,7 +31,7 @@ body{
   background-repeat:no-repeat;
   background-position:center;
   background-size:contain;
-  opacity:0.3;
+  opacity:0.35;
   z-index:0;
   pointer-events:none;
 }
@@ -48,7 +48,7 @@ body::before{
   z-index:0;
 }
 
-/* alert states */
+/* alert states override EVERYTHING */
 body.yellow-alert{
   background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
@@ -63,7 +63,10 @@ body.red-alert{
   max-width:900px;
 }
 
-h1{ font-size:3rem; }
+h1{
+  font-size:3rem;
+  text-transform:uppercase; /* ✅ ALL CAPS TITLE */
+}
 
 #targetTime{
   font-size:3rem;
@@ -141,7 +144,9 @@ if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
 
-/* 🧠 SINGLE TRUE NORMALIZER (NO EDGE CASES LEFT) */
+/* =========================
+   NORMALIZER (FIXED)
+========================= */
 function normalizeTeamName(input){
   return (input || "")
     .toLowerCase()
@@ -151,7 +156,9 @@ function normalizeTeamName(input){
     .replace(/[^a-z0-9]/g,"");
 }
 
-/* 🏀 NBA */
+/* =========================
+   NBA TEAMS
+========================= */
 const nbaTeams = {
   hawks:{id:"1610612737"},
   celtics:{id:"1610612738"},
@@ -185,7 +192,9 @@ const nbaTeams = {
   nets:{id:"1610612751"}
 };
 
-/* 🏀 WNBA */
+/* =========================
+   WNBA TEAMS
+========================= */
 const wnbaTeams = {
   aces:{id:"1611661319"},
   dream:{id:"1611661330"},
@@ -204,34 +213,33 @@ const wnbaTeams = {
   fire:{id:"1611661327"}
 };
 
-/* 🧠 MATCHUP PARSER */
+/* =========================
+   MATCHUP PARSER (FIXED vs BUG)
+========================= */
 function parseMatchup(t){
 
   const cleaned = (t || "")
     .replace(/\s+/g," ")
     .trim();
 
-  // ONLY match standalone separators: vs, vs., v, @
   const parts = cleaned.split(/\s+(?:vs\.?|v|@)\s+/i);
 
   const teams = parts
     .map(normalizeTeamName)
     .filter(Boolean);
 
-  console.log("RAW TITLE:", t);
-  console.log("CLEANED:", cleaned);
-  console.log("PARSED TEAMS:", teams);
-
   if(teams.length < 2) return null;
 
   return {
-    left: teams[0],
-    right: teams[1]
+    left:teams[0],
+    right:teams[1]
   };
 }
-/* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
-function find(team){
 
+/* =========================
+   LOOKUP
+========================= */
+function find(team){
   const key = normalizeTeamName(team);
 
   const nba = nbaTeams[key];
@@ -243,7 +251,9 @@ function find(team){
   return null;
 }
 
-/* 🖼 LOGO BUILDER */
+/* =========================
+   LOGO
+========================= */
 function logo(t){
   if(!t) return null;
 
@@ -252,7 +262,14 @@ function logo(t){
     : `https://cdn.wnba.com/logos/wnba/${t.id}/primary/D/logo.svg`;
 }
 
-/* 🏟 APPLY BACKGROUND */
+/* =========================
+   STATE
+========================= */
+let alertLevel = "normal";
+
+/* =========================
+   APPLY BACKGROUNDS
+========================= */
 function apply(){
 
   const m = parseMatchup(titleRaw);
@@ -261,11 +278,27 @@ function apply(){
   const l = logo(find(m.left));
   const r = logo(find(m.right));
 
-  if(l) bgLeft.style.backgroundImage=`url(${l})`;
-  if(r) bgRight.style.backgroundImage=`url(${r})`;
+  if(alertLevel === "normal"){
+
+    if(l){
+      bgLeft.style.backgroundImage =
+        `linear-gradient(135deg,rgba(0,0,0,0.3),rgba(0,0,0,0.7)),url(${l})`;
+    }
+
+    if(r){
+      bgRight.style.backgroundImage =
+        `linear-gradient(135deg,rgba(0,0,0,0.3),rgba(0,0,0,0.7)),url(${r})`;
+    }
+
+  } else {
+    bgLeft.style.backgroundImage = "none";
+    bgRight.style.backgroundImage = "none";
+  }
 }
 
-/* ⏰ ALERT SYSTEM */
+/* =========================
+   ALERTS
+========================= */
 let triggered={
   3600000:false,
   1800000:false,
@@ -282,8 +315,9 @@ function showAlert(text){
 
 const target=new Date(end).getTime();
 
-title.innerText=titleRaw;
-targetTime.innerText=new Date(end).toLocaleString();
+/* TITLE ALL CAPS */
+title.innerText = (titleRaw || "").toUpperCase();
+targetTime.innerText = new Date(end).toLocaleString();
 
 apply();
 
@@ -297,12 +331,19 @@ function tick(){
   minutes.innerText=String(Math.floor((d%3600000)/60000)).padStart(2,"0");
   seconds.innerText=String(Math.floor((d%60000)/1000)).padStart(2,"0");
 
-  if(d<=1800000)document.body.classList.add("yellow-alert");
+  /* PRIORITY SYSTEM */
+  if(d <= 1800000){
+    document.body.classList.add("yellow-alert");
+    alertLevel = "yellow";
+  }
 
-  if(d<=300000){
+  if(d <= 300000){
     document.body.classList.remove("yellow-alert");
     document.body.classList.add("red-alert");
+    alertLevel = "red";
   }
+
+  apply();
 
   const alerts=[
     [3600000,"1 HOUR"],
