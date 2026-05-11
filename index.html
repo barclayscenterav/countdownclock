@@ -238,7 +238,9 @@ const wnbaTeams = {
 
 /* 🧠 MATCHUP */
 function parseMatchup(t){
-
+console.log("RAW TITLE:", t);
+console.log("CLEANED:", cleaned);
+console.log("SPLIT PARTS:", parts);
   const cleaned = (t || "")
     .replace(/\s+/g," ")
     .trim();
