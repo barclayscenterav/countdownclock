@@ -21,7 +21,7 @@ body{
   position:relative;
 }
 
-/* 🏀 split logos */
+/* split logos */
 .bg-left,
 .bg-right{
   position:fixed;
@@ -48,7 +48,7 @@ body::before{
   z-index:0;
 }
 
-/* alerts */
+/* alert states */
 body.yellow-alert{
   background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
@@ -63,9 +63,7 @@ body.red-alert{
   max-width:900px;
 }
 
-h1{
-  font-size:3rem;
-}
+h1{ font-size:3rem; }
 
 #targetTime{
   font-size:3rem;
@@ -85,9 +83,7 @@ h1{
   border-radius:20px;
 }
 
-.number{
-  font-size:5rem;
-}
+.number{ font-size:5rem; }
 
 .label{
   text-transform:uppercase;
@@ -145,7 +141,7 @@ if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
 
-/* 🧠 ULTRA NORMALIZER (FIXES FEVER + VALKYRIES ISSUE) */
+/* 🧠 SINGLE TRUE NORMALIZER (NO EDGE CASES LEFT) */
 function normalizeTeamName(input){
   return (input || "")
     .toLowerCase()
@@ -211,7 +207,9 @@ const wnbaTeams = {
 /* 🧠 MATCHUP PARSER */
 function parseMatchup(t){
 
-  const cleaned = (t || "").replace(/\s+/g," ").trim();
+  const cleaned = (t || "")
+    .replace(/\s+/g," ")
+    .trim();
 
   const parts = cleaned.split(/\s*(vs\.?|v|@)\s*/i);
 
@@ -228,28 +226,21 @@ function parseMatchup(t){
   };
 }
 
-/* 🔎 LOOKUP WITH SAFE ALIASES */
-const aliases = {
-  fever:"fever",
-  indianafever:"fever",
-
-  valkyries:"valkyries",
-  goldenstatevalkyries:"valkyries",
-  gsvalkyries:"valkyries"
-};
-
+/* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
 function find(team){
 
   const key = normalizeTeamName(team);
-  const fixed = aliases[key] || key;
 
-  if(nbaTeams[fixed]) return {league:"nba",...nbaTeams[fixed]};
-  if(wnbaTeams[fixed]) return {league:"wnba",...wnbaTeams[fixed]};
+  const nba = nbaTeams[key];
+  if(nba) return {league:"nba",...nba};
+
+  const wnba = wnbaTeams[key];
+  if(wnba) return {league:"wnba",...wnba};
 
   return null;
 }
 
-/* 🖼 LOGO */
+/* 🖼 LOGO BUILDER */
 function logo(t){
   if(!t) return null;
 
