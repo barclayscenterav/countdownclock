@@ -48,7 +48,7 @@ body::before{
   z-index:0;
 }
 
-/* alert backgrounds */
+/* alerts */
 body.yellow-alert{
   background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
@@ -94,7 +94,7 @@ h1{
   color:#cbd5e1;
 }
 
-/* alert overlay */
+/* alert */
 #alertOverlay{
   position:fixed;
   inset:0;
@@ -145,15 +145,17 @@ if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
 
-/* 🧠 GLOBAL NORMALIZER (FIXES ALL INPUT ISSUES) */
+/* 🧠 ULTRA NORMALIZER (FIXES FEVER + VALKYRIES ISSUE) */
 function normalizeTeamName(input){
-  return input
+  return (input || "")
     .toLowerCase()
     .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9]/g,"");
 }
 
-/* 🏀 NBA TEAMS */
+/* 🏀 NBA */
 const nbaTeams = {
   hawks:{id:"1610612737"},
   celtics:{id:"1610612738"},
@@ -187,7 +189,7 @@ const nbaTeams = {
   nets:{id:"1610612751"}
 };
 
-/* 🏀 WNBA TEAMS */
+/* 🏀 WNBA */
 const wnbaTeams = {
   aces:{id:"1611661319"},
   dream:{id:"1611661330"},
@@ -206,14 +208,17 @@ const wnbaTeams = {
   fire:{id:"1611661327"}
 };
 
-/* 🧠 MATCHUP PARSER (vs, v, vs., @ supported) */
+/* 🧠 MATCHUP PARSER */
 function parseMatchup(t){
 
-  const parts = t.split(/\s*(vs\.?|v|@)\s*/i);
+  const cleaned = (t || "").replace(/\s+/g," ").trim();
+
+  const parts = cleaned.split(/\s*(vs\.?|v|@)\s*/i);
 
   const teams = parts
     .filter((_,i)=>i%2===0)
-    .map(normalizeTeamName);
+    .map(normalizeTeamName)
+    .filter(Boolean);
 
   if(teams.length < 2) return null;
 
@@ -223,20 +228,29 @@ function parseMatchup(t){
   };
 }
 
-/* 🔎 LOOKUP */
+/* 🔎 LOOKUP WITH SAFE ALIASES */
+const aliases = {
+  fever:"fever",
+  indianafever:"fever",
+
+  valkyries:"valkyries",
+  goldenstatevalkyries:"valkyries",
+  gsvalkyries:"valkyries"
+};
+
 function find(team){
 
   const key = normalizeTeamName(team);
+  const fixed = aliases[key] || key;
 
-  if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
-  if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
+  if(nbaTeams[fixed]) return {league:"nba",...nbaTeams[fixed]};
+  if(wnbaTeams[fixed]) return {league:"wnba",...wnbaTeams[fixed]};
 
   return null;
 }
 
-/* 🖼 LOGO BUILDER */
+/* 🖼 LOGO */
 function logo(t){
-
   if(!t) return null;
 
   return t.league==="nba"
