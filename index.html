@@ -568,7 +568,7 @@ function renderClock(){
   const t = formatClock();
 
   timeOfDay.innerHTML = `
-    TIME OF DAY:
+    TIME OF DAY: 
     <span>${t.h}</span><span class="time-dot">:</span>
     <span>${t.m}</span><span class="time-dot">:</span>
     <span>${t.s}</span><span>${t.ampm}</span>
@@ -654,7 +654,7 @@ function tick(){
     );
   }
 
-  if(d <= 300000){
+  if(d <= 600000){
 
     document.body.classList.remove(
       "yellow-alert"
