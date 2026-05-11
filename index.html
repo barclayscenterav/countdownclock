@@ -140,7 +140,20 @@ const end = params.get("end");
 if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
+/* =========================
+   ALIASES (NEW FIX)
+========================= */
+const teamAliases = {
+  "76ers":"sixers",
+  "philadelphia76ers":"sixers",
+  "sixers":"sixers",
 
+  "blazers":"blazers",
+  "trailblazers":"blazers",
+  "trailblazers":"blazers",
+  "trailblazer":"blazers",
+  "trail blazers":"blazers"
+};
 /* 🧠 SINGLE TRUE NORMALIZER (NO EDGE CASES LEFT) */
 function normalizeTeamName(input){
   return (input || "")
@@ -175,7 +188,6 @@ const nbaTeams = {
   thunder:{id:"1610612760"},
   magic:{id:"1610612753"},
   sixers:{id:"1610612755"},
-  76ers:{id:"1610612755"},
   suns:{id:"1610612756"},
   blazers:{id:"1610612757"},
   kings:{id:"1610612758"},
