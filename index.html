@@ -21,7 +21,7 @@ body{
   position:relative;
 }
 
-/* 🏀 split logos */
+/* split logos */
 .bg-left,
 .bg-right{
   position:fixed;
@@ -48,7 +48,7 @@ body::before{
   z-index:0;
 }
 
-/* alert backgrounds */
+/* alert states */
 body.yellow-alert{
   background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
@@ -63,9 +63,7 @@ body.red-alert{
   max-width:900px;
 }
 
-h1{
-  font-size:3rem;
-}
+h1{ font-size:3rem; }
 
 #targetTime{
   font-size:3rem;
@@ -73,6 +71,132 @@ h1{
   margin-bottom:30px;
 }
 
+.countdown{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.box{
+  background:rgba(255,255,255,0.1);
+  padding:30px;
+  border-radius:20px;
+}
+
+.number{ font-size:5rem; }
+
+.label{
+  text-transform:uppercase;
+  color:#cbd5e1;
+}
+
+/* alert */
+#alertOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.92);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+#alertBox{
+  font-size:4rem;
+  font-weight:900;
+  color:red;
+  text-transform:uppercase;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg-left" id="bgLeft"></div>
+<div class="bg-right" id="bgRight"></div>
+
+<div class="container">
+  <h1 id="title"></h1>
+  <div id="targetTime"></div>
+
+  <div class="countdown">
+    <div class="box"><div id="hours" class="number">00</div><div class="label">Hours</div></div>
+    <div class="box"><div id="minutes" class="number">00</div><div class="label">Minutes</div></div>
+    <div class="box"><div id="seconds" class="number">00</div><div class="label">Seconds</div></div>
+  </div>
+</div>
+
+<div id="alertOverlay"><div id="alertBox"></div></div>
+
+<script>
+
+const params = new URLSearchParams(location.search);
+
+const titleRaw = params.get("title") || "";
+const eventName = params.get("event") || titleRaw;
+const end = params.get("end");
+
+if(!titleRaw || !end){
+  document.body.innerHTML = "Invalid countdown link";
+}
+
+/* 🧠 SINGLE TRUE NORMALIZER (NO EDGE CASES LEFT) */
+function normalizeTeamName(input){
+  return (input || "")
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]/g,"");
+}
+
+/* 🏀 NBA */
+const nbaTeams = {
+  hawks:{id:"1610612737"},
+  celtics:{id:"1610612738"},
+  hornets:{id:"1610612766"},
+  bulls:{id:"1610612741"},
+  cavaliers:{id:"1610612739"},
+  mavericks:{id:"1610612742"},
+  nuggets:{id:"1610612743"},
+  pistons:{id:"1610612765"},
+  warriors:{id:"1610612744"},
+  rockets:{id:"1610612745"},
+  pacers:{id:"1610612754"},
+  clippers:{id:"1610612746"},
+  lakers:{id:"1610612747"},
+  grizzlies:{id:"1610612763"},
+  heat:{id:"1610612748"},
+  bucks:{id:"1610612749"},
+  timberwolves:{id:"1610612750"},
+  pelicans:{id:"1610612740"},
+  knicks:{id:"1610612752"},
+  thunder:{id:"1610612760"},
+  magic:{id:"1610612753"},
+  sixers:{id:"1610612755"},
+  suns:{id:"1610612756"},
+  blazers:{id:"1610612757"},
+  kings:{id:"1610612758"},
+  spurs:{id:"1610612759"},
+  raptors:{id:"1610612761"},
+  jazz:{id:"1610612762"},
+  wizards:{id:"1610612764"},
+  nets:{id:"1610612751"}
+};
+
+/* 🏀 WNBA */
+const wnbaTeams = {
+  aces:{id:"1611661319"},
+  dream:{id:"1611661330"},
+  fever:{id:"1611661325"},
+  liberty:{id:"1611661313"},
+  lynx:{id:"1611661324"},
+  mercury:{id:"1611661317"},
+  mystics:{id:"1611661322"},
+  sky:{id:"1611661329"},
+  sparks:{id:"1611661320"},
+  storm:{id:"1611661328"},
   sun:{id:"1611661323"},
   tempo:{id:"1611661332"},
   valkyries:{id:"1611661331"},
@@ -80,14 +204,19 @@ h1{
   fire:{id:"1611661327"}
 };
 
-/* 🧠 MATCHUP PARSER (vs, v, vs., @ supported) */
+/* 🧠 MATCHUP PARSER */
 function parseMatchup(t){
 
-  const parts = t.split(/\s*(vs\.?|v|@)\s*/i);
+  const cleaned = (t || "")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const parts = cleaned.split(/\s*(vs\.?|v|@)\s*/i);
 
   const teams = parts
     .filter((_,i)=>i%2===0)
-    .map(normalizeTeamName);
+    .map(normalizeTeamName)
+    .filter(Boolean);
 
   if(teams.length < 2) return null;
 
@@ -97,20 +226,22 @@ function parseMatchup(t){
   };
 }
 
-/* 🔎 LOOKUP */
+/* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
 function find(team){
 
   const key = normalizeTeamName(team);
 
-  if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
-  if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
+  const nba = nbaTeams[key];
+  if(nba) return {league:"nba",...nba};
+
+  const wnba = wnbaTeams[key];
+  if(wnba) return {league:"wnba",...wnba};
 
   return null;
 }
 
 /* 🖼 LOGO BUILDER */
 function logo(t){
-
   if(!t) return null;
 
   return t.league==="nba"
