@@ -110,7 +110,6 @@ h1{
   font-weight:900;
   color:red;
   text-transform:uppercase;
-  text-align:center;
 }
 
 </style>
@@ -142,22 +141,41 @@ const titleRaw = params.get("title") || "";
 const eventName = params.get("event") || titleRaw;
 const end = params.get("end");
 
-if(!titleRaw || !end){
-  document.body.innerHTML = "Invalid link";
-}
-
-/* NBA */
+/* 🏀 FULL NBA */
 const nbaTeams = {
-  knicks:{id:"1610612752"},
+  hawks:{id:"1610612737"},
   celtics:{id:"1610612738"},
-  lakers:{id:"1610612747"},
-  warriors:{id:"1610612744"},
+  hornets:{id:"1610612766"},
   bulls:{id:"1610612741"},
+  cavaliers:{id:"1610612739"},
+  mavericks:{id:"1610612742"},
+  nuggets:{id:"1610612743"},
+  pistons:{id:"1610612765"},
+  warriors:{id:"1610612744"},
+  rockets:{id:"1610612745"},
+  pacers:{id:"1610612754"},
+  clippers:{id:"1610612746"},
+  lakers:{id:"1610612747"},
+  grizzlies:{id:"1610612763"},
   heat:{id:"1610612748"},
+  bucks:{id:"1610612749"},
+  timberwolves:{id:"1610612750"},
+  pelicans:{id:"1610612740"},
+  knicks:{id:"1610612752"},
+  thunder:{id:"1610612760"},
+  magic:{id:"1610612753"},
+  sixers:{id:"1610612755"},
+  suns:{id:"1610612756"},
+  blazers:{id:"1610612757"},
+  kings:{id:"1610612758"},
+  spurs:{id:"1610612759"},
+  raptors:{id:"1610612761"},
+  jazz:{id:"1610612762"},
+  wizards:{id:"1610612764"},
   nets:{id:"1610612751"}
 };
 
-/* WNBA */
+/* 🏀 FULL WNBA */
 const wnbaTeams = {
   aces:{id:"1611661319"},
   dream:{id:"1611661330"},
@@ -176,7 +194,7 @@ const wnbaTeams = {
   fire:{id:"1611661327"}
 };
 
-/* matchup parser */
+/* 🧠 matchup parser */
 function parseMatchup(t){
   const p = t.split(/\s*(vs\.?|v|@)\s*/i);
   const teams = p.filter((_,i)=>i%2===0);
@@ -187,12 +205,14 @@ function parseMatchup(t){
   };
 }
 
+/* lookup */
 function find(team){
   if(nbaTeams[team]) return {league:"nba",...nbaTeams[team]};
   if(wnbaTeams[team]) return {league:"wnba",...wnbaTeams[team]};
   return null;
 }
 
+/* logo builder */
 function logo(t){
   if(!t) return null;
   return t.league==="nba"
@@ -200,7 +220,7 @@ function logo(t){
     : `https://cdn.wnba.com/logos/wnba/${t.id}/primary/D/logo.svg`;
 }
 
-/* split bg */
+/* apply split */
 function apply(){
   const m = parseMatchup(titleRaw);
   if(!m) return;
@@ -212,38 +232,33 @@ function apply(){
   if(r) bgRight.style.backgroundImage=`url(${r})`;
 }
 
-let triggered = {
-  3600000:false,
-  1800000:false,
-  900000:false,
-  600000:false,
-  300000:false
-};
+/* alerts */
+let triggered={3600000:false,1800000:false,900000:false,600000:false,300000:false};
 
 function showAlert(text){
-  alertBox.innerText = text;
+  alertBox.innerText=text;
   alertOverlay.style.display="flex";
   setTimeout(()=>alertOverlay.style.display="none",15000);
 }
 
-const target = new Date(end).getTime();
+const target=new Date(end).getTime();
 
-title.innerText = titleRaw;
-targetTime.innerText = new Date(end).toLocaleString();
+title.innerText=titleRaw;
+targetTime.innerText=new Date(end).toLocaleString();
 
 apply();
 
 function tick(){
 
-  const now = Date.now();
-  const d = target-now;
-  if(d<=0) return;
+  const now=Date.now();
+  const d=target-now;
+  if(d<=0)return;
 
   hours.innerText=String(Math.floor(d/3600000)).padStart(2,"0");
   minutes.innerText=String(Math.floor((d%3600000)/60000)).padStart(2,"0");
   seconds.innerText=String(Math.floor((d%60000)/1000)).padStart(2,"0");
 
-  if(d<=1800000) document.body.classList.add("yellow-alert");
+  if(d<=1800000)document.body.classList.add("yellow-alert");
   if(d<=300000){
     document.body.classList.remove("yellow-alert");
     document.body.classList.add("red-alert");
@@ -257,10 +272,10 @@ function tick(){
     [300000,"5 MINUTES"]
   ];
 
-  for(const [t,label] of alerts){
-    if(d<=t && !triggered[t]){
-      triggered[t]=true;
-      showAlert(`${label} TO ${eventName}`);
+  for(const[a,t]of alerts){
+    if(d<=a&&!triggered[a]){
+      triggered[a]=true;
+      showAlert(`${t} TO ${eventName}`);
     }
   }
 }
