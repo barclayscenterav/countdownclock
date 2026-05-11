@@ -162,14 +162,10 @@ function generateUrl(){
     encodeURIComponent(endTime);
 
   // FORCE index.html
-  const baseUrl =
-    window.location.origin +
-    window.location.pathname
-      .substring(
-        0,
-        window.location.pathname.lastIndexOf("/")
-      ) +
-    "/index.html";
+const baseUrl =
+  window.location.origin +
+  window.location.pathname
+    .replace(/\/admin\.html$/, "/index.html");
 
   const finalUrl =
     `${baseUrl}?title=${encodedTitle}&end=${encodedEndTime}`;
