@@ -575,14 +575,28 @@ function renderClock(){
 
   const t = formatClock();
 
-  timeOfDay.innerHTML = `
-    <span class="tod-label">TIME OF DAY:</span>
-    <span class="tod-clock">
-      <span>${t.h}</span><span class="time-dot">:</span>
-      <span>${t.m}</span><span class="time-dot">:</span>
-      <span>${t.s}</span><span>${t.ampm}</span>
-    </span>
+  const label = document.createElement("span");
+  label.textContent = "TIME OF DAY:";
+
+  const clock = document.createElement("span");
+  clock.style.display = "inline-flex";
+  clock.style.alignItems = "center";
+  clock.style.gap = "0px";
+
+  clock.innerHTML = `
+    <span>${t.h}</span><span class="time-dot">:</span>
+    <span>${t.m}</span><span class="time-dot">:</span>
+    <span>${t.s}</span><span>${t.ampm}</span>
   `;
+
+  timeOfDay.innerHTML = "";
+  timeOfDay.style.display = "flex";
+  timeOfDay.style.justifyContent = "center";
+  timeOfDay.style.alignItems = "center";
+  timeOfDay.style.gap = "8px";
+
+  timeOfDay.appendChild(label);
+  timeOfDay.appendChild(clock);
 }
 
 renderClock();
