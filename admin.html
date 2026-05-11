@@ -5,7 +5,6 @@
 <title>Admin</title>
 
 <style>
-
 *{
   box-sizing:border-box;
 }
@@ -27,7 +26,6 @@ body{
   background:#1e293b;
   padding:30px;
   border-radius:14px;
-
   display:flex;
   flex-direction:column;
   gap:18px;
@@ -38,8 +36,6 @@ h2{
   text-align:center;
   font-size:2rem;
 }
-
-/* form groups */
 
 .field{
   display:flex;
@@ -65,8 +61,6 @@ input{
   color:#0f172a;
 }
 
-/* button */
-
 button{
   width:100%;
   padding:14px;
@@ -83,8 +77,6 @@ button{
 button:hover{
   background:#2563eb;
 }
-
-/* preview card */
 
 .preview{
   background:#0f172a;
@@ -107,6 +99,11 @@ button:hover{
   line-height:1.5;
 }
 
+.help{
+  font-size:13px;
+  color:#94a3b8;
+  line-height:1.4;
+}
 </style>
 </head>
 
@@ -114,42 +111,20 @@ button:hover{
 
 <div class="box">
 
-  <h2>Create Doors Countdown</h2>
-
-  <!-- TITLE -->
+  <h2>Create Countdown</h2>
 
   <div class="field">
-
     <label for="title">
-      Matchup Title
+      Event Title
     </label>
 
     <input
       id="title"
-      placeholder="e.g. Fever vs Valkyries"
+      placeholder="e.g. Fever vs Valkyries, Concert, Graduation"
     >
-
   </div>
 
-  <!-- DOORS -->
-
   <div class="field">
-
-    <label for="doorsEnd">
-      Doors Time
-    </label>
-
-    <input
-      id="doorsEnd"
-      type="datetime-local"
-    >
-
-  </div>
-
-  <!-- VIP DOORS -->
-
-  <div class="field">
-
     <label for="vipEnd">
       VIP Doors Time
     </label>
@@ -158,19 +133,40 @@ button:hover{
       id="vipEnd"
       type="datetime-local"
     >
-
   </div>
 
-  <!-- BUTTON -->
+  <div class="field">
+    <label for="doorsEnd">
+      Doors Time
+    </label>
+
+    <input
+      id="doorsEnd"
+      type="datetime-local"
+    >
+  </div>
+
+  <div class="field">
+    <label for="backgroundImage">
+      Background Image URL Optional
+    </label>
+
+    <input
+      id="backgroundImage"
+      placeholder="e.g. assets/backgrounds/event.jpg"
+    >
+
+    <div class="help">
+      Upload the image to your GitHub repo first, then paste the image path here.
+      Leave blank for automatic basketball team logos.
+    </div>
+  </div>
 
   <button onclick="copyURL()">
     Copy URL
   </button>
 
-  <!-- URL PREVIEW -->
-
   <div class="preview">
-
     <div class="preview-title">
       Live URL
     </div>
@@ -178,17 +174,11 @@ button:hover{
     <div id="urlPreview">
       Waiting for input...
     </div>
-
   </div>
 
 </div>
 
 <script>
-
-/* =========================
-   ELEMENTS
-========================= */
-
 const titleInput =
   document.getElementById("title");
 
@@ -198,12 +188,11 @@ const doorsEndInput =
 const vipEndInput =
   document.getElementById("vipEnd");
 
+const backgroundImageInput =
+  document.getElementById("backgroundImage");
+
 const urlPreview =
   document.getElementById("urlPreview");
-
-/* =========================
-   URL BUILDER
-========================= */
 
 function buildURL(){
 
@@ -215,6 +204,9 @@ function buildURL(){
 
   const vipEnd =
     vipEndInput.value;
+
+  const backgroundImage =
+    backgroundImageInput.value.trim();
 
   const base =
     window.location.origin +
@@ -238,12 +230,16 @@ function buildURL(){
     vipEnd
   );
 
+  if(backgroundImage){
+
+    url.searchParams.set(
+      "bg",
+      backgroundImage
+    );
+  }
+
   return url.toString();
 }
-
-/* =========================
-   LIVE PREVIEW
-========================= */
 
 function updatePreview(){
 
@@ -272,10 +268,6 @@ function updatePreview(){
     buildURL();
 }
 
-/* =========================
-   COPY URL
-========================= */
-
 async function copyURL(){
 
   const title =
@@ -294,7 +286,7 @@ async function copyURL(){
   ){
 
     alert(
-      "Please complete all fields."
+      "Please complete the event title, VIP doors time, and doors time."
     );
 
     return;
@@ -316,14 +308,10 @@ async function copyURL(){
   }catch(err){
 
     alert(
-      "Copy failed. Please copy manually."
+      "Copy failed. Please copy the URL manually."
     );
   }
 }
-
-/* =========================
-   LISTENERS
-========================= */
 
 titleInput.addEventListener(
   "input",
@@ -340,10 +328,12 @@ vipEndInput.addEventListener(
   updatePreview
 );
 
-/* initial */
+backgroundImageInput.addEventListener(
+  "input",
+  updatePreview
+);
 
 updatePreview();
-
 </script>
 
 </body>
