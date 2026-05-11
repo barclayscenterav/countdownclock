@@ -18,6 +18,12 @@ body{
   min-height:100vh;
   text-align:center;
   padding:20px;
+  transition: background 0.5s ease;
+}
+
+/* DARK RED MODE */
+body.red-alert{
+  background:linear-gradient(135deg,#3b0000,#7f0000);
 }
 
 .container{
@@ -27,7 +33,14 @@ body{
 
 h1{
   font-size:3rem;
+  margin-bottom:10px;
+}
+
+#targetTime{
+  font-size:3rem;
+  font-weight:bold;
   margin-bottom:40px;
+  color:#cbd5e1;
 }
 
 .countdown{
@@ -54,19 +67,13 @@ h1{
   font-size:1rem;
 }
 
-#endTimeDisplay{
-  margin-top:30px;
-  color:#cbd5e1;
-  font-size:1.2rem;
-}
-
 #message{
   margin-top:30px;
   font-size:2rem;
   color:#4ade80;
 }
 
-/* ALERT OVERLAY */
+/* ALERT */
 #alertOverlay{
   position:fixed;
   top:0;
@@ -98,6 +105,7 @@ h1{
 
 @media(max-width:600px){
   h1{font-size:2rem;}
+  #targetTime{font-size:2rem;}
   .number{font-size:3rem;}
   #alertBox{font-size:2rem;}
 }
@@ -110,6 +118,8 @@ h1{
 <div class="container">
 
   <h1 id="title">Countdown</h1>
+
+  <div id="targetTime"></div>
 
   <div class="countdown">
 
@@ -130,7 +140,6 @@ h1{
 
   </div>
 
-  <div id="endTimeDisplay"></div>
   <div id="message"></div>
 
 </div>
@@ -156,12 +165,12 @@ if(!title || !end){
 
 } else {
 
+  const targetDateObj = new Date(end);
+  const targetDate = targetDateObj.getTime();
+
   document.getElementById("title").innerText = title;
-
-  const targetDate = new Date(end).getTime();
-
-  document.getElementById("endTimeDisplay").innerText =
-    "Ends on: " + new Date(end).toLocaleString();
+  document.getElementById("targetTime").innerText =
+    targetDateObj.toLocaleString();
 
   function showAlert(text){
 
@@ -202,6 +211,11 @@ if(!title || !end){
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+    // 🔥 5 minute warning red mode
+    if(totalMinutes <= 5){
+      document.body.classList.add("red-alert");
+    }
+
     document.getElementById("hours").innerText =
       String(hours).padStart(2,"0");
 
@@ -221,7 +235,7 @@ if(!title || !end){
     document.getElementById("secondsLabel").innerText =
       seconds === 1 ? "Second" : "Seconds";
 
-    // alert triggers
+    // ALERT LOGIC
     let alertKey = "";
 
     if(totalMinutes === 30 && seconds === 0) alertKey = "30";
