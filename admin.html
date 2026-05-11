@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Admin</title>
-
 <style>
 body{
   font-family:Arial;
@@ -13,19 +7,36 @@ body{
   justify-content:center;
   align-items:center;
   height:100vh;
+  margin:0;
 }
 
+/* main container */
 .box{
   background:#1e293b;
   padding:30px;
   border-radius:12px;
   width:400px;
+
+  /* ✅ CENTER EVERYTHING INSIDE */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:12px;
+}
+
+h2{
+  margin:0 0 10px 0;
+  text-align:center;
 }
 
 input{
   width:100%;
-  margin:10px 0;
   padding:10px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  text-align:center; /* optional but matches centered style */
 }
 
 button{
@@ -35,47 +46,16 @@ button{
   color:white;
   border:none;
   cursor:pointer;
+  border-radius:6px;
+  font-weight:bold;
 }
 
+button:hover{
+  background:#2563eb;
+}
+
+#out{
+  width:100%;
+  margin-top:10px;
+}
 </style>
-</head>
-
-<body>
-
-<div class="box">
-<h2>Create Countdown</h2>
-
-<input id="title" placeholder="Title (e.g. Knicks vs Celtics)">
-<input id="event" placeholder="Alert text (e.g. Game)">
-<input id="end" type="datetime-local">
-
-<button onclick="gen()">Generate</button>
-
-<input id="out" readonly>
-</div>
-
-<script>
-
-function gen(){
-
-  // ✅ FIX: properly reference DOM elements
-  const titleVal = document.getElementById("title").value;
-  const eventVal = document.getElementById("event").value;
-  const endVal = document.getElementById("end").value;
-
-  const base =
-    window.location.origin +
-    "/countdownclock/index.html";
-
-  const url =
-    `${base}?title=${encodeURIComponent(titleVal)}&event=${encodeURIComponent(eventVal)}&end=${encodeURIComponent(endVal)}`;
-
-  document.getElementById("out").value = url;
-
-  console.log("Generated URL:", url);
-}
-
-</script>
-
-</body>
-</html>
