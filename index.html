@@ -137,54 +137,352 @@ h1{
 <script>
 
 const nbaTeams = {
-  "hawks": "1610612737",
-  "celtics": "1610612738",
-  "nets": "1610612751",
-  "hornets": "1610612766",
-  "bulls": "1610612741",
-  "cavaliers": "1610612739",
-  "mavericks": "1610612742",
-  "nuggets": "1610612743",
-  "pistons": "1610612765",
-  "warriors": "1610612744",
-  "rockets": "1610612745",
-  "pacers": "1610612754",
-  "clippers": "1610612746",
-  "lakers": "1610612747",
-  "grizzlies": "1610612763",
-  "heat": "1610612748",
-  "bucks": "1610612749",
-  "timberwolves": "1610612750",
-  "pelicans": "1610612740",
-  "knicks": "1610612752",
-  "thunder": "1610612760",
-  "magic": "1610612753",
-  "76ers": "1610612755",
-  "suns": "1610612756",
-  "trailblazers": "1610612757",
-  "kings": "1610612758",
-  "spurs": "1610612759",
-  "raptors": "1610612761",
-  "jazz": "1610612762",
-  "wizards": "1610612764"
+  hawks: {
+    name: "Atlanta Hawks",
+    id: "1610612737",
+    primary: "#E03A3E",
+    secondary: "#C1D32F",
+    logo: "https://cdn.nba.com/logos/nba/1610612737/primary/D/logo.svg"
+  },
+
+  celtics: {
+    name: "Boston Celtics",
+    id: "1610612738",
+    primary: "#007A33",
+    secondary: "#BA9653",
+    logo: "https://cdn.nba.com/logos/nba/1610612738/primary/D/logo.svg"
+  },
+
+  hornets: {
+    name: "Charlotte Hornets",
+    id: "1610612766",
+    primary: "#1D1160",
+    secondary: "#00788C",
+    logo: "https://cdn.nba.com/logos/nba/1610612766/primary/D/logo.svg"
+  },
+
+  bulls: {
+    name: "Chicago Bulls",
+    id: "1610612741",
+    primary: "#CE1141",
+    secondary: "#000000",
+    logo: "https://cdn.nba.com/logos/nba/1610612741/primary/D/logo.svg"
+  },
+
+  cavaliers: {
+    name: "Cleveland Cavaliers",
+    id: "1610612739",
+    primary: "#860038",
+    secondary: "#BC945C",
+    logo: "https://cdn.nba.com/logos/nba/1610612739/primary/D/logo.svg"
+  },
+
+  mavericks: {
+    name: "Dallas Mavericks",
+    id: "1610612742",
+    primary: "#00538C",
+    secondary: "#B8C4CA",
+    logo: "https://cdn.nba.com/logos/nba/1610612742/primary/D/logo.svg"
+  },
+
+  nuggets: {
+    name: "Denver Nuggets",
+    id: "1610612743",
+    primary: "#0E2240",
+    secondary: "#FEC524",
+    logo: "https://cdn.nba.com/logos/nba/1610612743/primary/D/logo.svg"
+  },
+
+  pistons: {
+    name: "Detroit Pistons",
+    id: "1610612765",
+    primary: "#1D42BA",
+    secondary: "#C8102E",
+    logo: "https://cdn.nba.com/logos/nba/1610612765/primary/D/logo.svg"
+  },
+
+  warriors: {
+    name: "Golden State Warriors",
+    id: "1610612744",
+    primary: "#1D428A",
+    secondary: "#FFC72C",
+    logo: "https://cdn.nba.com/logos/nba/1610612744/primary/D/logo.svg"
+  },
+
+  rockets: {
+    name: "Houston Rockets",
+    id: "1610612745",
+    primary: "#CE1141",
+    secondary: "#000000",
+    logo: "https://cdn.nba.com/logos/nba/1610612745/primary/D/logo.svg"
+  },
+
+  pacers: {
+    name: "Indiana Pacers",
+    id: "1610612754",
+    primary: "#002D62",
+    secondary: "#FDBB30",
+    logo: "https://cdn.nba.com/logos/nba/1610612754/primary/D/logo.svg"
+  },
+
+  clippers: {
+    name: "LA Clippers",
+    id: "1610612746",
+    primary: "#C8102E",
+    secondary: "#1D428A",
+    logo: "https://cdn.nba.com/logos/nba/1610612746/primary/D/logo.svg"
+  },
+
+  lakers: {
+    name: "Los Angeles Lakers",
+    id: "1610612747",
+    primary: "#552583",
+    secondary: "#FDB927",
+    logo: "https://cdn.nba.com/logos/nba/1610612747/primary/D/logo.svg"
+  },
+
+  grizzlies: {
+    name: "Memphis Grizzlies",
+    id: "1610612763",
+    primary: "#5D76A9",
+    secondary: "#12173F",
+    logo: "https://cdn.nba.com/logos/nba/1610612763/primary/D/logo.svg"
+  },
+
+  heat: {
+    name: "Miami Heat",
+    id: "1610612748",
+    primary: "#98002E",
+    secondary: "#F9A01B",
+    logo: "https://cdn.nba.com/logos/nba/1610612748/primary/D/logo.svg"
+  },
+
+  bucks: {
+    name: "Milwaukee Bucks",
+    id: "1610612749",
+    primary: "#00471B",
+    secondary: "#EEE1C6",
+    logo: "https://cdn.nba.com/logos/nba/1610612749/primary/D/logo.svg"
+  },
+
+  timberwolves: {
+    name: "Minnesota Timberwolves",
+    id: "1610612750",
+    primary: "#0C233F",
+    secondary: "#79BC43",
+    logo: "https://cdn.nba.com/logos/nba/1610612750/primary/D/logo.svg"
+  },
+
+  pelicans: {
+    name: "New Orleans Pelicans",
+    id: "1610612740",
+    primary: "#0C2340",
+    secondary: "#85714D",
+    logo: "https://cdn.nba.com/logos/nba/1610612740/primary/D/logo.svg"
+  },
+
+  knicks: {
+    name: "New York Knicks",
+    id: "1610612752",
+    primary: "#1D428A",
+    secondary: "#F58426",
+    logo: "https://cdn.nba.com/logos/nba/1610612752/primary/D/logo.svg"
+  },
+
+  thunder: {
+    name: "Oklahoma City Thunder",
+    id: "1610612760",
+    primary: "#007AC1",
+    secondary: "#EF3B24",
+    logo: "https://cdn.nba.com/logos/nba/1610612760/primary/D/logo.svg"
+  },
+
+  magic: {
+    name: "Orlando Magic",
+    id: "1610612753",
+    primary: "#0077C0",
+    secondary: "#C4CED4",
+    logo: "https://cdn.nba.com/logos/nba/1610612753/primary/D/logo.svg"
+  },
+
+  sixers: {
+    name: "Philadelphia 76ers",
+    id: "1610612755",
+    primary: "#1D428A",
+    secondary: "#C8102E",
+    logo: "https://cdn.nba.com/logos/nba/1610612755/primary/D/logo.svg"
+  },
+
+  suns: {
+    name: "Phoenix Suns",
+    id: "1610612756",
+    primary: "#1D1160",
+    secondary: "#E56020",
+    logo: "https://cdn.nba.com/logos/nba/1610612756/primary/D/logo.svg"
+  },
+
+  blazers: {
+    name: "Portland Trail Blazers",
+    id: "1610612757",
+    primary: "#E03A3E",
+    secondary: "#000000",
+    logo: "https://cdn.nba.com/logos/nba/1610612757/primary/D/logo.svg"
+  },
+
+  kings: {
+    name: "Sacramento Kings",
+    id: "1610612758",
+    primary: "#5A2D81",
+    secondary: "#63727A",
+    logo: "https://cdn.nba.com/logos/nba/1610612758/primary/D/logo.svg"
+  },
+
+  spurs: {
+    name: "San Antonio Spurs",
+    id: "1610612759",
+    primary: "#000000",
+    secondary: "#C4CED4",
+    logo: "https://cdn.nba.com/logos/nba/1610612759/primary/D/logo.svg"
+  },
+
+  raptors: {
+    name: "Toronto Raptors",
+    id: "1610612761",
+    primary: "#CE1141",
+    secondary: "#000000",
+    logo: "https://cdn.nba.com/logos/nba/1610612761/primary/D/logo.svg"
+  },
+
+  jazz: {
+    name: "Utah Jazz",
+    id: "1610612762",
+    primary: "#000000",
+    secondary: "#FFF21F",
+    logo: "https://cdn.nba.com/logos/nba/1610612762/primary/D/logo.svg"
+  },
+
+  wizards: {
+    name: "Washington Wizards",
+    id: "1610612764",
+    primary: "#002B5C",
+    secondary: "#E31837",
+    logo: "https://cdn.nba.com/logos/nba/1610612764/primary/D/logo.svg"
+  },
+
+  nets: {
+    name: "Brooklyn Nets",
+    id: "1610612751",
+    primary: "#000000",
+    secondary: "#FFFFFF",
+    logo: "https://cdn.nba.com/logos/nba/1610612751/primary/D/logo.svg"
+  }
 };
 
 const wnbaTeams = {
-  "dream": "1611661312",
-  "fever": "1611661320",
-  "sky": "1611661325",
-  "sun": "1611661324",
-  "liberty": "1611661313",
-  "aces": "1611661323",
-  "lynx": "1611661317",
-  "mercury": "1611661321",
-  "mystics": "1611661319",
-  "storm": "1611661316",
-  "wings": "1611661322",
-  "valkyries": "1611661330",
-  "fire": "1611661331",
-  "blaze": "1611661332",
-  "rising": "1611661333"
+  aces: {
+    id: "1611661319",
+    primary: "#CE1141",
+    secondary: "#061922",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661319/primary/D/logo.svg"
+  },
+
+  dream: {
+    id: "1611661330",
+    primary: "#E31837",
+    secondary: "#373A36",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661330/primary/D/logo.svg"
+  },
+
+  fever: {
+    id: "1611661325",
+    primary: "#E03A3E",
+    secondary: "#002D62",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661325/primary/D/logo.svg"
+  },
+
+  liberty: {
+    id: "1611661313",
+    primary: "#86CEBC",
+    secondary: "#000000",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661313/primary/D/logo.svg"
+  },
+
+  lynx: {
+    id: "1611661324",
+    primary: "#0C233F",
+    secondary: "#266092",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661324/primary/D/logo.svg"
+  },
+
+  mercury: {
+    id: "1611661317",
+    primary: "#1D1160",
+    secondary: "#E56020",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661317/primary/D/logo.svg"
+  },
+
+  mystics: {
+    id: "1611661322",
+    primary: "#E03A3E",
+    secondary: "#002B5C",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661322/primary/D/logo.svg"
+  },
+
+  sky: {
+    id: "1611661329",
+    primary: "#5091CD",
+    secondary: "#FFD520",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661329/primary/D/logo.svg"
+  },
+
+  sparks: {
+    id: "1611661320",
+    primary: "#552583",
+    secondary: "#FDB927",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661320/primary/D/logo.svg"
+  },
+
+  storm: {
+    id: "1611661328",
+    primary: "#2C5235",
+    secondary: "#FEE11A",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661328/primary/D/logo.svg"
+  },
+
+  sun: {
+    id: "1611661323",
+    primary: "#002D62",
+    secondary: "#F3703A",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661323/primary/D/logo.svg"
+  },
+
+  tempo: {
+    id: "1611661332",
+    primary: "#441E36",
+    secondary: "#B3C7E7",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661332/primary/D/logo.svg"
+  },
+
+  valkyries: {
+    id: "1611661331",
+    primary: "#AD96DB",
+    secondary: "#2D2A27",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661331/primary/D/logo.svg"
+  },
+
+  wings: {
+    id: "1611661321",
+    primary: "#002B5C",
+    secondary: "#C4D600",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661321/primary/D/logo.svg"
+  },
+
+  fire: {
+    id: "1611661327",
+    primary: "#000000",
+    secondary: "#C8102E",
+    logo: "https://cdn.wnba.com/logos/wnba/1611661327/primary/D/logo.svg"
+  }
 };
 
 const params = new URLSearchParams(window.location.search);
