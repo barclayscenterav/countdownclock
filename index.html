@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown</title>
+<title>Barclays Center Countdown</title>
 
 <style>
 
@@ -74,23 +74,21 @@ h1{
   margin-bottom:10px;
 }
 
-/* bottom clock */
+/* bottom time display */
 #timeOfDay{
   position:fixed;
   bottom:25px;
   left:50%;
   transform:translateX(-50%);
+
   font-size:1.8rem;
   font-weight:800;
-  color:#fff;
+  letter-spacing:2px;
+  color:#ffffff;
+
   z-index:2;
   text-transform:uppercase;
-  display:flex;
-  justify-content:center;
-}
-
-#timeOfDay span{
-  white-space:nowrap;
+  text-align:center;
 }
 
 .time-dot{
@@ -123,7 +121,7 @@ h1{
   color:#cbd5e1;
 }
 
-/* alert */
+/* alert overlay */
 #alertOverlay{
   position:fixed;
   inset:0;
@@ -139,13 +137,27 @@ h1{
   font-weight:900;
   color:red;
   text-transform:uppercase;
+
   animation:flashAlert 0.7s infinite;
 }
 
+/* flashing animation */
 @keyframes flashAlert{
-  0%{opacity:1;transform:scale(1);}
-  50%{opacity:0.25;transform:scale(1.08);}
-  100%{opacity:1;transform:scale(1);}
+
+  0%{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  50%{
+    opacity:0.25;
+    transform:scale(1.08);
+  }
+
+  100%{
+    opacity:1;
+    transform:scale(1);
+  }
 }
 
 </style>
@@ -159,9 +171,11 @@ h1{
 <div class="container">
 
   <h1 id="title"></h1>
+
   <div id="targetTime"></div>
 
   <div class="countdown">
+
     <div class="box">
       <div id="hours" class="number">00</div>
       <div class="label">Hours</div>
@@ -176,6 +190,7 @@ h1{
       <div id="seconds" class="number">00</div>
       <div class="label">Seconds</div>
     </div>
+
   </div>
 
 </div>
@@ -188,19 +203,34 @@ h1{
 
 <script>
 
-const params = new URLSearchParams(location.search);
+/* =========================
+   URL PARAMS
+========================= */
 
-const titleRaw = params.get("title") || "";
-const eventName = params.get("event") || titleRaw;
-const end = params.get("end");
+const params =
+  new URLSearchParams(location.search);
+
+const titleRaw =
+  params.get("title") || "";
+
+const eventName =
+  params.get("event") || titleRaw;
+
+const end =
+  params.get("end");
 
 if(!titleRaw || !end){
-  document.body.innerHTML = "Invalid countdown link";
+
+  document.body.innerHTML =
+    "Invalid countdown link";
 }
 
-/* ---------------- NORMALIZER ---------------- */
+/* =========================
+   NORMALIZER
+========================= */
 
 function normalizeTeamName(input){
+
   return (input || "")
     .toLowerCase()
     .trim()
@@ -211,9 +241,30 @@ function normalizeTeamName(input){
     .trim();
 }
 
-/* ---------------- TEAMS ---------------- */
+/* =========================
+   ALIASES
+========================= */
+
+const teamAliases = {
+
+  "76ers":"sixers",
+  "philadelphia 76ers":"sixers",
+
+  "trail blazers":"blazers",
+  "trailblazers":"blazers"
+};
+
+function applyAlias(key){
+
+  return teamAliases[key] || key;
+}
+
+/* =========================
+   NBA
+========================= */
 
 const nbaTeams = {
+
   hawks:{id:"1610612737"},
   celtics:{id:"1610612738"},
   hornets:{id:"1610612766"},
@@ -246,7 +297,12 @@ const nbaTeams = {
   nets:{id:"1610612751"}
 };
 
+/* =========================
+   WNBA
+========================= */
+
 const wnbaTeams = {
+
   aces:{id:"1611661319"},
   dream:{id:"1611661330"},
   fever:{id:"1611661325"},
@@ -264,25 +320,18 @@ const wnbaTeams = {
   fire:{id:"1611661327"}
 };
 
-/* alias */
-const teamAliases = {
-  "76ers":"sixers",
-  "philadelphia 76ers":"sixers",
-  "trail blazers":"blazers",
-  "trailblazers":"blazers"
-};
-
-function applyAlias(k){
-  return teamAliases[k] || k;
-}
-
-/* ---------------- SMART MATCHUP ---------------- */
+/* =========================
+   SMART MATCHUP PARSER
+========================= */
 
 function parseMatchup(title){
 
-  const cleaned = normalizeTeamName(title).replace(/\s/g,"");
+  const normalized =
+    normalizeTeamName(title)
+      .replace(/\s/g,"");
 
   const allTeams = [
+
     ...Object.keys(nbaTeams),
     ...Object.keys(wnbaTeams),
     ...Object.keys(teamAliases)
@@ -290,79 +339,230 @@ function parseMatchup(title){
 
   const found = [];
 
-  for(const t of allTeams){
+  for(const team of allTeams){
 
-    const key = t.replace(/\s/g,"");
+    const normalizedTeam =
+      team.replace(/\s/g,"");
 
-    if(cleaned.includes(key)){
+    if(normalized.includes(normalizedTeam)){
 
-      const fixed = applyAlias(t);
+      const aliasFixed =
+        applyAlias(team);
 
-      if(!found.includes(fixed)){
-        found.push(fixed);
+      if(!found.includes(aliasFixed)){
+
+        found.push(aliasFixed);
       }
     }
   }
 
-  if(found.length < 2) return null;
+  console.log("FOUND TEAMS:", found);
+
+  if(found.length < 2){
+
+    return null;
+  }
 
   return {
-    left:found[0],
-    right:found[1]
+    left: found[0],
+    right: found[1]
   };
 }
 
-/* ---------------- LOOKUP ---------------- */
+/* =========================
+   LOOKUP
+========================= */
 
 function find(team){
 
-  let key = normalizeTeamName(team);
-  key = applyAlias(key);
-  key = key.replace(/\s/g,"");
+  let key =
+    normalizeTeamName(team);
 
-  if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
-  if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
+  key =
+    applyAlias(key);
+
+  key =
+    key.replace(/\s/g,"");
+
+  if(nbaTeams[key]){
+
+    return {
+      league:"nba",
+      ...nbaTeams[key]
+    };
+  }
+
+  if(wnbaTeams[key]){
+
+    return {
+      league:"wnba",
+      ...wnbaTeams[key]
+    };
+  }
+
+  console.log("NO MATCH:", key);
 
   return null;
 }
 
-/* ---------------- LOGO ---------------- */
+/* =========================
+   LOGO URL
+========================= */
 
-function logo(t){
-  if(!t) return null;
+function logo(team){
 
-  return t.league==="nba"
-    ? `https://cdn.nba.com/logos/nba/${t.id}/primary/D/logo.svg`
-    : `https://cdn.wnba.com/logos/wnba/${t.id}/primary/D/logo.svg`;
+  if(!team) return null;
+
+  return team.league === "nba"
+
+    ? `https://cdn.nba.com/logos/nba/${team.id}/primary/D/logo.svg`
+
+    : `https://cdn.wnba.com/logos/wnba/${team.id}/primary/D/logo.svg`;
 }
 
-/* ---------------- APPLY ---------------- */
+/* =========================
+   APPLY LOGOS
+========================= */
 
 function apply(){
 
-  const m = parseMatchup(titleRaw);
-  if(!m) return;
+  const matchup =
+    parseMatchup(titleRaw);
 
-  const l = logo(find(m.left));
-  const r = logo(find(m.right));
+  console.log("MATCHUP:", matchup);
 
-  if(l) bgLeft.style.backgroundImage=`url(${l})`;
-  if(r) bgRight.style.backgroundImage=`url(${r})`;
+  if(!matchup) return;
+
+  const leftTeam =
+    find(matchup.left);
+
+  const rightTeam =
+    find(matchup.right);
+
+  const leftLogo =
+    logo(leftTeam);
+
+  const rightLogo =
+    logo(rightTeam);
+
+  if(leftLogo){
+
+    bgLeft.style.backgroundImage =
+      `url(${leftLogo})`;
+  }
+
+  if(rightLogo){
+
+    bgRight.style.backgroundImage =
+      `url(${rightLogo})`;
+  }
 }
 
-/* ---------------- CLOCK ---------------- */
+/* =========================
+   ALERT SYSTEM
+========================= */
 
+function showAlert(text){
+
+  alertBox.innerText = text;
+
+  alertOverlay.style.display = "flex";
+
+  setTimeout(() => {
+
+    alertOverlay.style.display = "none";
+
+  }, 10000);
+}
+
+const target =
+  new Date(end).getTime();
+
+const alertTimes = [
+
+  [3600000,"1 HOUR"],
+  [1800000,"30 MINUTES"],
+  [900000,"15 MINUTES"],
+  [600000,"10 MINUTES"],
+  [300000,"5 MINUTES"]
+];
+
+let triggered = {};
+
+/* refresh-safe init */
+(function initTriggered(){
+
+  const now =
+    Date.now();
+
+  const remaining =
+    target - now;
+
+  for(const [time] of alertTimes){
+
+    triggered[time] =
+      remaining <= time;
+  }
+
+})();
+
+/* =========================
+   LABEL FIX
+========================= */
+
+function labelSingular(
+  value,
+  singular,
+  plural
+){
+
+  return Number(value) === 1
+    ? singular
+    : plural;
+}
+
+/* =========================
+   INIT
+========================= */
+
+title.innerText =
+  titleRaw.toUpperCase();
+
+const eventDate =
+  new Date(end);
+
+/* top display */
+targetTime.innerText =
+  eventDate.toLocaleString(
+    undefined,
+    {
+      weekday:"long",
+      month:"long",
+      day:"numeric",
+      year:"numeric",
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
+
+/* bottom display */
 function formatClock(){
-  const n = new Date();
-  let h = n.getHours();
-  const m = String(n.getMinutes()).padStart(2,"0");
-  const s = String(n.getSeconds()).padStart(2,"0");
-  const ampm = h>=12?"PM":"AM";
-  h = h%12||12;
-  return {h,m,s,ampm};
+
+  const now = new Date();
+
+  let h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2,"0");
+  const s = String(now.getSeconds()).padStart(2,"0");
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  h = h ? h : 12;
+
+  return { h, m, s, ampm };
 }
 
 function renderClock(){
+
   const t = formatClock();
 
   timeOfDay.innerHTML = `
@@ -374,53 +574,116 @@ function renderClock(){
 }
 
 renderClock();
-setInterval(renderClock,1000);
-
-/* ---------------- COUNTDOWN ---------------- */
-
-let triggered={3600000:false,1800000:false,900000:false,600000:false,300000:false};
-
-function showAlert(text){
-  alertBox.innerText=text;
-  alertOverlay.style.display="flex";
-  setTimeout(()=>alertOverlay.style.display="none",10000);
-}
-
-const target = new Date(end).getTime();
-
-title.innerText = titleRaw.toUpperCase();
-targetTime.innerText = new Date(end).toLocaleString();
+setInterval(renderClock, 1000);
 
 apply();
 
+/* =========================
+   LOOP
+========================= */
+
 function tick(){
 
-  const now=Date.now();
-  const d=target-now;
-  if(d<=0) return;
+  const now =
+    Date.now();
 
-  hours.innerText=String(Math.floor(d/3600000)).padStart(2,"0");
-  minutes.innerText=String(Math.floor((d%3600000)/60000)).padStart(2,"0");
-  seconds.innerText=String(Math.floor((d%60000)/1000)).padStart(2,"0");
+  const d =
+    target - now;
 
-  const alerts=[
-    [3600000,"1 HOUR"],
-    [1800000,"30 MINUTES"],
-    [900000,"15 MINUTES"],
-    [600000,"10 MINUTES"],
-    [300000,"5 MINUTES"]
-  ];
+  if(d <= 0) return;
 
-  for(const [a,label] of alerts){
-    if(d<=a && !triggered[a]){
-      triggered[a]=true;
-      showAlert(`${label} TO ${eventName}`);
+  const h =
+    String(
+      Math.floor(d/3600000)
+    ).padStart(2,"0");
+
+  const m =
+    String(
+      Math.floor((d%3600000)/60000)
+    ).padStart(2,"0");
+
+  const s =
+    String(
+      Math.floor((d%60000)/1000)
+    ).padStart(2,"0");
+
+  hours.innerText = h;
+  minutes.innerText = m;
+  seconds.innerText = s;
+
+  /* singular labels */
+
+  document
+    .querySelectorAll(".box")[0]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        h,
+        "Hour",
+        "Hours"
+      );
+
+  document
+    .querySelectorAll(".box")[1]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        m,
+        "Minute",
+        "Minutes"
+      );
+
+  document
+    .querySelectorAll(".box")[2]
+    .querySelector(".label")
+    .innerText =
+      labelSingular(
+        s,
+        "Second",
+        "Seconds"
+      );
+
+  /* color states */
+
+  if(d <= 1800000){
+
+    document.body.classList.add(
+      "yellow-alert"
+    );
+  }
+
+  if(d <= 300000){
+
+    document.body.classList.remove(
+      "yellow-alert"
+    );
+
+    document.body.classList.add(
+      "red-alert"
+    );
+  }
+
+  /* alerts */
+
+  for(const [a,label] of alertTimes){
+
+    if(d <= a && !triggered[a]){
+
+      triggered[a] = true;
+
+      showAlert(
+        `${label} TO ${eventName}`
+      );
     }
   }
 }
 
 tick();
-setInterval(tick,1000);
+
+setInterval(
+  tick,
+  1000
+);
 
 </script>
 
