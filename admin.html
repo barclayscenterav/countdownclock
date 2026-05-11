@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin</title>
+
 <style>
 body{
   font-family:Arial;
@@ -35,6 +36,7 @@ button{
   border:none;
   cursor:pointer;
 }
+
 </style>
 </head>
 
@@ -56,18 +58,21 @@ button{
 
 function gen(){
 
-  const t = title.value;
-  const e = event.value;
-  const end = end.value;
+  // ✅ FIX: properly reference DOM elements
+  const titleVal = document.getElementById("title").value;
+  const eventVal = document.getElementById("event").value;
+  const endVal = document.getElementById("end").value;
 
   const base =
     window.location.origin +
     "/countdownclock/index.html";
 
   const url =
-`${base}?title=${encodeURIComponent(t)}&event=${encodeURIComponent(e)}&end=${encodeURIComponent(end)}`;
+    `${base}?title=${encodeURIComponent(titleVal)}&event=${encodeURIComponent(eventVal)}&end=${encodeURIComponent(endVal)}`;
 
-  out.value = url;
+  document.getElementById("out").value = url;
+
+  console.log("Generated URL:", url);
 }
 
 </script>
