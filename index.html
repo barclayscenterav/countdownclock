@@ -256,18 +256,38 @@ function parseMatchup(t){
     right: normalizeTeamName(right)
   };
 }
-
+  
+function logLookup(stage, value){
+  console.log(`[${stage}]`, value);
+}
 /* 🔎 LOOKUP (FIXED ORDER) */
 function find(team){
 
+  logLookup("INPUT", team);
+
   let key = normalizeTeamName(team);
+  logLookup("NORMALIZED", key);
+
   key = applyAlias(key);
-  key = key.replace(/\s/g,"");
+  logLookup("AFTER_ALIAS", key);
 
-  if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
-  if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
+  let nbaKey = key.replace(/\s/g,"");
+  logLookup("NBA_KEY", nbaKey);
 
-  console.log("❌ NO MATCH:", team, "→", key);
+  if(nbaTeams[nbaKey]){
+    logLookup("NBA_MATCH", nbaTeams[nbaKey]);
+    return {league:"nba", ...nbaTeams[nbaKey]};
+  }
+
+  let wnbaKey = key.replace(/\s/g,"");
+  logLookup("WNBA_KEY", wnbaKey);
+
+  if(wnbaTeams[wnbaKey]){
+    logLookup("WNBA_MATCH", wnbaTeams[wnbaKey]);
+    return {league:"wnba", ...wnbaTeams[wnbaKey]};
+  }
+
+  logLookup("NO_MATCH", team);
   return null;
 }
 
