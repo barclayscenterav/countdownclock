@@ -140,6 +140,7 @@ const end = params.get("end");
 if(!titleRaw || !end){
   document.body.innerHTML = "Invalid countdown link";
 }
+
 /* =========================
    ALIASES (NEW FIX)
 ========================= */
@@ -154,14 +155,18 @@ const teamAliases = {
   "trailblazer":"blazers",
   "trail blazers":"blazers"
 };
-/* 🧠 SINGLE TRUE NORMALIZER (NO EDGE CASES LEFT) */
+
+/* 🧠 NORMALIZER (UPDATED WITH ALIASES) */
 function normalizeTeamName(input){
-  return (input || "")
+
+  let key = (input || "")
     .toLowerCase()
     .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9]/g,"");
+
+  return teamAliases[key] || key;
 }
 
 /* 🏀 NBA */
@@ -224,16 +229,13 @@ function parseMatchup(t){
     .replace(/\s+/g," ")
     .trim();
 
-  // ONLY match standalone separators: vs, vs., v, @
-  const parts = cleaned.split(/\s+(?:vs\.?|v|@)\s+/i);
+  const parts = cleaned.split(/\s*(?:vs\.?|v|@)\s*/i);
 
   const teams = parts
     .map(normalizeTeamName)
     .filter(Boolean);
 
-  console.log("RAW TITLE:", t);
-  console.log("CLEANED:", cleaned);
-  console.log("PARSED TEAMS:", teams);
+  console.log("TEAMS:", teams);
 
   if(teams.length < 2) return null;
 
@@ -242,21 +244,19 @@ function parseMatchup(t){
     right: teams[1]
   };
 }
-/* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
+
+/* 🔎 LOOKUP */
 function find(team){
 
   const key = normalizeTeamName(team);
 
-  const nba = nbaTeams[key];
-  if(nba) return {league:"nba",...nba};
-
-  const wnba = wnbaTeams[key];
-  if(wnba) return {league:"wnba",...wnba};
+  if(nbaTeams[key]) return {league:"nba",...nbaTeams[key]};
+  if(wnbaTeams[key]) return {league:"wnba",...wnbaTeams[key]};
 
   return null;
 }
 
-/* 🖼 LOGO BUILDER */
+/* 🖼 LOGO */
 function logo(t){
   if(!t) return null;
 
@@ -265,7 +265,7 @@ function logo(t){
     : `https://cdn.wnba.com/logos/wnba/${t.id}/primary/D/logo.svg`;
 }
 
-/* 🏟 APPLY BACKGROUND */
+/* 🏟 APPLY */
 function apply(){
 
   const m = parseMatchup(titleRaw);
@@ -274,8 +274,8 @@ function apply(){
   const l = logo(find(m.left));
   const r = logo(find(m.right));
 
-  if(l) bgLeft.style.backgroundImage=`url(${l})`;
-  if(r) bgRight.style.backgroundImage=`url(${r})`;
+  if(l) bgLeft.style.backgroundImage = `url(${l})`;
+  if(r) bgRight.style.backgroundImage = `url(${r})`;
 }
 
 /* ⏰ ALERT SYSTEM */
