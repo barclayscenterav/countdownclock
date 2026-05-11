@@ -21,7 +21,7 @@ body{
   transition: background 0.5s ease;
 }
 
-/* DARK RED MODE */
+/* RED MODE (last 5 min) */
 body.red-alert{
   background:linear-gradient(135deg,#3b0000,#7f0000);
 }
@@ -31,11 +31,13 @@ body.red-alert{
   max-width:900px;
 }
 
+/* MAIN TITLE */
 h1{
   font-size:3rem;
   margin-bottom:10px;
 }
 
+/* EVENT TIME DISPLAY */
 #targetTime{
   font-size:3rem;
   font-weight:bold;
@@ -154,6 +156,7 @@ h1{
 const params = new URLSearchParams(window.location.search);
 
 const title = params.get("title");
+const event = params.get("event") || title;
 const end = params.get("end");
 
 let lastAlertKey = "";
@@ -211,7 +214,7 @@ if(!title || !end){
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // 🔥 5 minute warning red mode
+    // 🔥 RED MODE LAST 5 MINUTES
     if(totalMinutes <= 5){
       document.body.classList.add("red-alert");
     }
@@ -258,7 +261,8 @@ if(!title || !end){
         timeText = `${totalMinutes} MINUTE${totalMinutes === 1 ? "" : "S"}`;
       }
 
-      showAlert(`${timeText} TO ${title}`);
+      // ✅ USE EVENT LABEL HERE
+      showAlert(`${timeText} TO ${event}`);
     }
   }
 
