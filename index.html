@@ -211,10 +211,10 @@ function parseMatchup(t){
     .replace(/\s+/g," ")
     .trim();
 
-  const parts = cleaned.split(/\s*(vs\.?|v|@)\s*/i);
+  // ONLY match standalone separators: vs, vs., v, @
+  const parts = cleaned.split(/\s+(?:vs\.?|v|@)\s+/i);
 
   const teams = parts
-    .filter((_,i)=>i%2===0)
     .map(normalizeTeamName)
     .filter(Boolean);
 
@@ -225,8 +225,8 @@ function parseMatchup(t){
   if(teams.length < 2) return null;
 
   return {
-    left:teams[0],
-    right:teams[1]
+    left: teams[0],
+    right: teams[1]
   };
 }
 /* 🔎 SAFE LOOKUP (NO FAIL CASES POSSIBLE) */
