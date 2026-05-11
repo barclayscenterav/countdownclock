@@ -5,67 +5,109 @@
 <title>Admin</title>
 
 <style>
-* {
-  box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
 body{
-  font-family:Arial;
+  margin:0;
+  font-family:Arial,sans-serif;
   background:#0f172a;
   color:white;
-  margin:0;
-
   min-height:100vh;
   display:grid;
   place-items:center;
 }
 
-/* main panel */
 .box{
+  width:500px;
   background:#1e293b;
   padding:30px;
-  border-radius:12px;
-  width:400px;
+  border-radius:14px;
 
   display:flex;
   flex-direction:column;
-  align-items:stretch;
-  gap:12px;
-
-  text-align:center;
+  gap:14px;
 }
 
 h2{
-  margin:0 0 10px 0;
+  margin:0;
+  text-align:center;
 }
 
 input{
   width:100%;
-  padding:10px;
-  border-radius:6px;
+  padding:12px;
   border:none;
+  border-radius:8px;
+  font-size:16px;
   outline:none;
   text-align:center;
 }
 
 button{
   width:100%;
-  padding:12px;
+  padding:14px;
+  border:none;
+  border-radius:8px;
   background:#3b82f6;
   color:white;
-  border:none;
-  cursor:pointer;
-  border-radius:6px;
+  font-size:16px;
   font-weight:bold;
+  cursor:pointer;
 }
 
 button:hover{
   background:#2563eb;
 }
 
-#out{
-  width:100%;
-  padding:10px;
+/* preview cards */
+.preview{
+  background:#0f172a;
+  border-radius:10px;
+  padding:16px;
+}
+
+.preview-title{
+  font-size:14px;
+  color:#94a3b8;
+  margin-bottom:8px;
+  text-transform:uppercase;
+}
+
+#matchupPreview{
+  font-size:20px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.team{
+  color:#ffffff;
+}
+
+.separator{
+  color:#3b82f6;
+  padding:0 10px;
+}
+
+#urlPreview{
+  word-break:break-all;
+  color:#38bdf8;
+  font-size:14px;
+}
+
+.status{
+  text-align:center;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.good{
+  color:#22c55e;
+}
+
+.bad{
+  color:#ef4444;
 }
 </style>
 </head>
@@ -73,41 +115,190 @@ button:hover{
 <body>
 
 <div class="box">
+
   <h2>Create Countdown</h2>
 
-  <input id="title" placeholder="Title (e.g. Knicks vs Celtics)">
-  <input id="event" placeholder="Alert text (e.g. Game)">
-  <input id="end" type="datetime-local">
+  <input
+    id="title"
+    placeholder="Title (e.g. Fever vs Valkyries)"
+  >
 
-  <button onclick="gen()">Generate</button>
+  <input
+    id="event"
+    placeholder="Alert text (e.g. Doors)"
+  >
 
-  <input id="out" readonly>
+  <input
+    id="end"
+    type="datetime-local"
+  >
+
+  <button onclick="copyURL()">Copy URL</button>
+
+  <!-- MATCHUP PREVIEW -->
+  <div class="preview">
+    <div class="preview-title">
+      Matchup Parsing
+    </div>
+
+    <div id="matchupPreview">
+      Waiting for title...
+    </div>
+
+    <div id="status" class="status bad">
+      No matchup detected
+    </div>
+  </div>
+
+  <!-- URL PREVIEW -->
+  <div class="preview">
+    <div class="preview-title">
+      Live URL
+    </div>
+
+    <div id="urlPreview">
+      Waiting for input...
+    </div>
+  </div>
+
 </div>
 
 <script>
 
-function gen(){
+/* =========================
+   ELEMENTS
+========================= */
 
-  const titleVal = document.getElementById("title").value;
-  const eventVal = document.getElementById("event").value;
-  const endVal = document.getElementById("end").value;
+const titleInput = document.getElementById("title");
+const eventInput = document.getElementById("event");
+const endInput = document.getElementById("end");
 
-  if(!titleVal || !endVal){
-    alert("Title and End time are required");
-    return;
-  }
+const matchupPreview =
+  document.getElementById("matchupPreview");
+
+const statusText =
+  document.getElementById("status");
+
+const urlPreview =
+  document.getElementById("urlPreview");
+
+/* =========================
+   MATCHUP PARSER
+========================= */
+
+function parseMatchup(title){
+
+  const cleaned = (title || "")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const match =
+    cleaned.match(/^(.+?)\s+(vs\.?|v\.?|@)\s+(.+)$/i);
+
+  if(!match) return null;
+
+  return {
+    left:match[1],
+    separator:match[2],
+    right:match[3]
+  };
+}
+
+/* =========================
+   URL BUILDER
+========================= */
+
+function buildURL(){
+
+  const title =
+    titleInput.value.trim();
+
+  const event =
+    eventInput.value.trim();
+
+  const end =
+    endInput.value;
 
   const base =
     window.location.origin +
     "/countdownclock/index";
 
-  const url =
-    `${base}?title=${encodeURIComponent(titleVal)}&event=${encodeURIComponent(eventVal)}&end=${encodeURIComponent(endVal)}`;
+  const url = new URL(base);
 
-  document.getElementById("out").value = url;
+  url.searchParams.set("title", title);
+  url.searchParams.set("event", event);
+  url.searchParams.set("end", end);
 
-  console.log("Generated URL:", url);
+  return url.toString();
 }
+
+/* =========================
+   LIVE PREVIEW
+========================= */
+
+function updatePreview(){
+
+  const title =
+    titleInput.value;
+
+  const parsed =
+    parseMatchup(title);
+
+  /* matchup preview */
+  if(parsed){
+
+    matchupPreview.innerHTML = `
+      <span class="team">${parsed.left}</span>
+      <span class="separator">${parsed.separator.toUpperCase()}</span>
+      <span class="team">${parsed.right}</span>
+    `;
+
+    statusText.innerText =
+      "Valid matchup detected";
+
+    statusText.className =
+      "status good";
+
+  }else{
+
+    matchupPreview.innerHTML =
+      "Waiting for valid matchup...";
+
+    statusText.innerText =
+      "No matchup detected";
+
+    statusText.className =
+      "status bad";
+  }
+
+  /* live url */
+  urlPreview.innerText =
+    buildURL();
+}
+
+/* =========================
+   COPY URL
+========================= */
+
+function copyURL(){
+
+  const url = buildURL();
+
+  navigator.clipboard.writeText(url);
+
+  alert("URL copied!");
+}
+
+/* =========================
+   LIVE LISTENERS
+========================= */
+
+titleInput.addEventListener("input",updatePreview);
+eventInput.addEventListener("input",updatePreview);
+endInput.addEventListener("input",updatePreview);
+
+/* initial */
+updatePreview();
 
 </script>
 
