@@ -162,10 +162,11 @@ function normalizeTeamName(input){
   return (input || "")
     .toLowerCase()
     .trim()
+    .replace(/\s+/g," ")   // preserve words first
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9\s]/g,"")
-    .replace(/\s+/g," ");
+    .trim();
 }
 
 /* =========================
@@ -242,17 +243,17 @@ function parseMatchup(t){
     .replace(/\s+/g," ")
     .trim();
 
-  const parts = cleaned.split(/\s*(?:vs\.?|v|@)\s*/i);
+  // ONLY match real separators with spacing context
+  const parts = cleaned.split(/\s+(vs\.?|v\.?|@)\s+/i);
 
-  const teams = parts
-    .map(normalizeTeamName)
-    .filter(Boolean);
+  if(parts.length < 2) return null;
 
-  if(teams.length < 2) return null;
+  const left = parts[0];
+  const right = parts[1];
 
   return {
-    left:teams[0],
-    right:teams[1]
+    left: normalizeTeamName(left),
+    right: normalizeTeamName(right)
   };
 }
 
