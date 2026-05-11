@@ -296,29 +296,51 @@ const wnbaTeams = {
    MATCHUP PARSER
 ========================= */
 
-function parseMatchup(t){
+function parseMatchup(title){
 
-  const cleaned = (t || "")
-    .replace(/\s+/g," ")
-    .trim();
+  const normalized =
+    normalizeTeamName(title)
+      .replace(/\s/g,"");
 
-  const match =
-    cleaned.match(
-      /^(.+?)\s+(?:vs\.?|v\.?|@)\s+(.+)$/i
-    );
+  /* all possible team keys */
+  const allTeams = [
 
-  if(!match) return null;
+    ...Object.keys(nbaTeams),
+    ...Object.keys(wnbaTeams),
+    ...Object.keys(teamAliases)
+  ];
+
+  const found = [];
+
+  for(const team of allTeams){
+
+    const normalizedTeam =
+      team.replace(/\s/g,"");
+
+    if(normalized.includes(normalizedTeam)){
+
+      const aliasFixed =
+        applyAlias(team);
+
+      if(!found.includes(aliasFixed)){
+
+        found.push(aliasFixed);
+      }
+    }
+  }
+
+  console.log("FOUND TEAMS:", found);
+
+  if(found.length < 2){
+
+    return null;
+  }
 
   return {
-
-    left:
-      normalizeTeamName(match[1]),
-
-    right:
-      normalizeTeamName(match[2])
+    left: found[0],
+    right: found[1]
   };
 }
-
 /* =========================
    LOOKUP
 ========================= */
