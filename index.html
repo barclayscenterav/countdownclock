@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown</title>
+<title>Barclays Center Countdown</title>
 
 <style>
 
@@ -50,7 +50,7 @@ body::before{
 
 /* alert states */
 body.yellow-alert{
-  background:linear-gradient(135deg,#3b2f00,#b38704) !important;
+  background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
 
 body.red-alert{
@@ -69,9 +69,24 @@ h1{
 }
 
 #targetTime{
-  font-size:3rem;
+  font-size:2.2rem;
   color:#cbd5e1;
-  margin-bottom:30px;
+  margin-bottom:10px;
+}
+
+/* bottom time display */
+#eventTime{
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%);
+
+  font-size:2rem;
+  font-weight:bold;
+  letter-spacing:2px;
+  color:#ffffff;
+
+  z-index:2;
 }
 
 .countdown{
@@ -168,6 +183,8 @@ h1{
   </div>
 
 </div>
+
+<div id="eventTime"></div>
 
 <div id="alertOverlay">
   <div id="alertBox"></div>
@@ -293,7 +310,7 @@ const wnbaTeams = {
 };
 
 /* =========================
-   MATCHUP PARSER
+   SMART MATCHUP PARSER
 ========================= */
 
 function parseMatchup(title){
@@ -302,7 +319,6 @@ function parseMatchup(title){
     normalizeTeamName(title)
       .replace(/\s/g,"");
 
-  /* all possible team keys */
   const allTeams = [
 
     ...Object.keys(nbaTeams),
@@ -341,6 +357,7 @@ function parseMatchup(title){
     right: found[1]
   };
 }
+
 /* =========================
    LOOKUP
 ========================= */
@@ -411,9 +428,6 @@ function apply(){
   const rightTeam =
     find(matchup.right);
 
-  console.log("LEFT TEAM:", leftTeam);
-  console.log("RIGHT TEAM:", rightTeam);
-
   const leftLogo =
     logo(leftTeam);
 
@@ -453,7 +467,6 @@ function showAlert(text){
 const target =
   new Date(end).getTime();
 
-/* alert times */
 const alertTimes = [
 
   [3600000,"1 HOUR"],
@@ -504,8 +517,32 @@ function labelSingular(
 title.innerText =
   titleRaw.toUpperCase();
 
+const eventDate =
+  new Date(end);
+
+/* top display */
 targetTime.innerText =
-  new Date(end).toLocaleString();
+  eventDate.toLocaleString(
+    undefined,
+    {
+      weekday:"long",
+      month:"long",
+      day:"numeric",
+      year:"numeric",
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
+
+/* bottom display */
+eventTime.innerText =
+  eventDate.toLocaleTimeString(
+    undefined,
+    {
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
 
 apply();
 
@@ -583,7 +620,7 @@ function tick(){
     );
   }
 
-  if(d <= 600000){
+  if(d <= 300000){
 
     document.body.classList.remove(
       "yellow-alert"
