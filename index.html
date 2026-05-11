@@ -238,22 +238,20 @@ const wnbaTeams = {
 
 /* 🧠 MATCHUP */
 function parseMatchup(t){
-  
+
   const cleaned = (t || "")
     .replace(/\s+/g," ")
     .trim();
 
-  // ONLY match real separators with spacing context
-  const parts = cleaned.split(/\s+(vs\.?|v\.?|@)\s+/i);
+  // MATCH: TEAM separator TEAM
+  const match =
+    cleaned.match(/^(.+?)\s+(?:vs\.?|v\.?|@)\s+(.+)$/i);
 
-  if(parts.length < 2) return null;
-
-  const left = parts[0];
-  const right = parts[1];
+  if(!match) return null;
 
   return {
-    left: normalizeTeamName(left),
-    right: normalizeTeamName(right)
+    left: normalizeTeamName(match[1]),
+    right: normalizeTeamName(match[2])
   };
 }
   
