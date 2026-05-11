@@ -10,10 +10,7 @@
 body{
   margin:0;
   font-family:Arial,sans-serif;
-
-  /* ✅ DEFAULT COLOR */
   background:#00395d;
-
   color:white;
   display:flex;
   justify-content:center;
@@ -21,21 +18,51 @@ body{
   min-height:100vh;
   text-align:center;
   padding:20px;
-
   transition: background 2s ease;
+  position:relative;
+  overflow:hidden;
 }
 
-/* 🟡 30 min warning */
+/* 🧊 SPLIT SCREEN LOGO LAYER */
+.bg-left,
+.bg-right{
+  position:fixed;
+  top:0;
+  width:50%;
+  height:100%;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  opacity:0.3;
+  z-index:0;
+  pointer-events:none;
+}
+
+.bg-left{ left:0; }
+.bg-right{ right:0; }
+
+/* dark overlay for readability */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:0;
+}
+
+/* 🟡 30 min */
 body.yellow-alert{
-  background:linear-gradient(135deg,#3b2f00,#7a5c00);
+  background:linear-gradient(135deg,#3b2f00,#7a5c00) !important;
 }
 
-/* 🔴 5 min warning */
+/* 🔴 5 min */
 body.red-alert{
-  background:linear-gradient(135deg,#3b0000,#7f0000);
+  background:linear-gradient(135deg,#3b0000,#7f0000) !important;
 }
 
 .container{
+  position:relative;
+  z-index:2;
   width:100%;
   max-width:900px;
 }
@@ -47,7 +74,6 @@ h1{
 
 #targetTime{
   font-size:3rem;
-  font-weight:bold;
   margin-bottom:40px;
   color:#cbd5e1;
 }
@@ -71,52 +97,8 @@ h1{
 
 .label{
   margin-top:10px;
+  text-transform:uppercase;
   color:#cbd5e1;
-  text-transform:uppercase;
-  font-size:1rem;
-}
-
-#message{
-  margin-top:30px;
-  font-size:2rem;
-  color:#4ade80;
-}
-
-/* ALERT */
-#alertOverlay{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.9);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-
-#alertBox{
-  font-size:3rem;
-  font-weight:bold;
-  color:red;
-  text-transform:uppercase;
-  text-align:center;
-  padding:20px;
-  animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.15);}
-  100%{transform:scale(1);}
-}
-
-@media(max-width:600px){
-  h1{font-size:2rem;}
-  #targetTime{font-size:2rem;}
-  .number{font-size:3rem;}
-  #alertBox{font-size:2rem;}
 }
 
 </style>
@@ -124,182 +106,172 @@ h1{
 
 <body>
 
+<!-- 🧊 SPLIT BACKGROUND ELEMENTS -->
+<div class="bg-left" id="bgLeft"></div>
+<div class="bg-right" id="bgRight"></div>
+
 <div class="container">
 
   <h1 id="title">Countdown</h1>
-
   <div id="targetTime"></div>
 
   <div class="countdown">
-
     <div class="box">
       <div class="number" id="hours">00</div>
-      <div class="label" id="hoursLabel">Hours</div>
+      <div class="label">Hours</div>
     </div>
 
     <div class="box">
       <div class="number" id="minutes">00</div>
-      <div class="label" id="minutesLabel">Minutes</div>
+      <div class="label">Minutes</div>
     </div>
 
     <div class="box">
       <div class="number" id="seconds">00</div>
-      <div class="label" id="secondsLabel">Seconds</div>
+      <div class="label">Seconds</div>
     </div>
-
   </div>
 
-  <div id="message"></div>
-
-</div>
-
-<!-- ALERT -->
-<div id="alertOverlay">
-  <div id="alertBox"></div>
 </div>
 
 <script>
 
+const nbaTeams = {
+  "hawks": "1610612737",
+  "celtics": "1610612738",
+  "nets": "1610612751",
+  "hornets": "1610612766",
+  "bulls": "1610612741",
+  "cavaliers": "1610612739",
+  "mavericks": "1610612742",
+  "nuggets": "1610612743",
+  "pistons": "1610612765",
+  "warriors": "1610612744",
+  "rockets": "1610612745",
+  "pacers": "1610612754",
+  "clippers": "1610612746",
+  "lakers": "1610612747",
+  "grizzlies": "1610612763",
+  "heat": "1610612748",
+  "bucks": "1610612749",
+  "timberwolves": "1610612750",
+  "pelicans": "1610612740",
+  "knicks": "1610612752",
+  "thunder": "1610612760",
+  "magic": "1610612753",
+  "76ers": "1610612755",
+  "suns": "1610612756",
+  "trailblazers": "1610612757",
+  "kings": "1610612758",
+  "spurs": "1610612759",
+  "raptors": "1610612761",
+  "jazz": "1610612762",
+  "wizards": "1610612764"
+};
+
+const wnbaTeams = {
+  "dream": "1611661312",
+  "fever": "1611661320",
+  "sky": "1611661325",
+  "sun": "1611661324",
+  "liberty": "1611661313",
+  "aces": "1611661323",
+  "lynx": "1611661317",
+  "mercury": "1611661321",
+  "mystics": "1611661319",
+  "storm": "1611661316",
+  "wings": "1611661322",
+  "valkyries": "1611661330",
+  "fire": "1611661331",
+  "blaze": "1611661332",
+  "rising": "1611661333"
+};
+
 const params = new URLSearchParams(window.location.search);
 
-const title = params.get("title");
-const event = params.get("event") || title;
+const titleRaw = params.get("title") || "";
+const title = titleRaw.toLowerCase();
 const end = params.get("end");
 
-let lastAlertKey = "";
-let yellowTriggered = false;
-let redTriggered = false;
+function detectMatchup(){
 
-if(!title || !end){
+  let teams = titleRaw.split(/ vs | v | @ /i);
 
-  document.getElementById("message").innerText =
-    "Invalid countdown link.";
+  if(teams.length < 2){
+    return null;
+  }
+
+  return {
+    left: teams[0].trim().toLowerCase(),
+    right: teams[1].trim().toLowerCase()
+  };
+}
+
+function getLogo(team){
+
+  if(nbaTeams[team]){
+    return `https://cdn.nba.com/logos/nba/${nbaTeams[team]}/primary/D/logo.svg`;
+  }
+
+  if(wnbaTeams[team]){
+    return `https://cdn.wnba.com/logos/wnba/${wnbaTeams[team]}/primary/D/logo.svg`;
+  }
+
+  return null;
+}
+
+function applyMatchupBackground(){
+
+  const matchup = detectMatchup();
+
+  if(!matchup) return;
+
+  const leftLogo = getLogo(matchup.left);
+  const rightLogo = getLogo(matchup.right);
+
+  if(leftLogo){
+    document.getElementById("bgLeft").style.backgroundImage =
+      `url('${leftLogo}')`;
+  }
+
+  if(rightLogo){
+    document.getElementById("bgRight").style.backgroundImage =
+      `url('${rightLogo}')`;
+  }
+}
+
+if(!titleRaw || !end){
+
+  document.body.innerHTML = "<h2>Invalid link</h2>";
 
 } else {
 
-  const targetDateObj = new Date(end);
-  const targetDate = targetDateObj.getTime();
+  const target = new Date(end).getTime();
 
-  document.getElementById("title").innerText = title;
+  document.getElementById("title").innerText = titleRaw;
   document.getElementById("targetTime").innerText =
-    targetDateObj.toLocaleString();
+    new Date(end).toLocaleString();
 
-  function setBackground(distance){
+  applyMatchupBackground();
 
-    // 🔴 5 min or less
-    if(distance <= 300000){
-      if(!redTriggered){
-        document.body.classList.remove("yellow-alert");
-        document.body.classList.add("red-alert");
-        redTriggered = true;
-      }
-    }
+  function update(){
 
-    // 🟡 30 min or less (but above 5 min)
-    else if(distance <= 1800000){
-      if(!yellowTriggered){
-        document.body.classList.add("yellow-alert");
-        yellowTriggered = true;
-      }
-    }
+    const now = Date.now();
+    const distance = target - now;
 
-    // 🔵 DEFAULT STATE
-    else{
-      document.body.classList.remove("yellow-alert");
-      document.body.classList.remove("red-alert");
-    }
+    if(distance <= 0) return;
+
+    const h = Math.floor(distance/3600000);
+    const m = Math.floor((distance%3600000)/60000);
+    const s = Math.floor((distance%60000)/1000);
+
+    document.getElementById("hours").innerText = String(h).padStart(2,"0");
+    document.getElementById("minutes").innerText = String(m).padStart(2,"0");
+    document.getElementById("seconds").innerText = String(s).padStart(2,"0");
   }
 
-  function showAlert(text){
-
-    const box = document.getElementById("alertBox");
-
-    box.innerText = text;
-    box.style.color = "red";
-    box.style.textTransform = "uppercase";
-
-    document.getElementById("alertOverlay").style.display = "flex";
-
-    setTimeout(()=>{
-      document.getElementById("alertOverlay").style.display = "none";
-    },15000);
-  }
-
-  function updateCountdown(){
-
-    const now = new Date().getTime();
-    const distance = targetDate - now;
-
-    if(distance <= 0){
-
-      clearInterval(timer);
-
-      document.body.classList.remove("yellow-alert");
-      document.body.classList.add("red-alert");
-
-      document.getElementById("hours").innerText = "00";
-      document.getElementById("minutes").innerText = "00";
-      document.getElementById("seconds").innerText = "00";
-
-      document.getElementById("message").innerText =
-        "Countdown Complete!";
-
-      return;
-    }
-
-    setBackground(distance);
-
-    const totalMinutes = Math.floor(distance / (1000 * 60));
-    const hours = Math.floor(distance / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById("hours").innerText =
-      String(hours).padStart(2,"0");
-
-    document.getElementById("minutes").innerText =
-      String(minutes).padStart(2,"0");
-
-    document.getElementById("seconds").innerText =
-      String(seconds).padStart(2,"0");
-
-    document.getElementById("hoursLabel").innerText =
-      hours === 1 ? "Hour" : "Hours";
-
-    document.getElementById("minutesLabel").innerText =
-      minutes === 1 ? "Minute" : "Minutes";
-
-    document.getElementById("secondsLabel").innerText =
-      seconds === 1 ? "Second" : "Seconds";
-
-    let alertKey = "";
-
-    if(totalMinutes === 30 && seconds === 0) alertKey = "30";
-    else if(totalMinutes === 15 && seconds === 0) alertKey = "15";
-    else if(totalMinutes === 10 && seconds === 0) alertKey = "10";
-    else if(totalMinutes === 5 && seconds === 0) alertKey = "5";
-    else if(totalMinutes % 60 === 0 && seconds === 0 && totalMinutes > 0)
-      alertKey = "hour-" + totalMinutes;
-
-    if(alertKey && alertKey !== lastAlertKey){
-
-      lastAlertKey = alertKey;
-
-      let timeText;
-
-      if(totalMinutes >= 60){
-        const hrs = Math.floor(totalMinutes / 60);
-        timeText = `${hrs} HOUR${hrs === 1 ? "" : "S"}`;
-      } else {
-        timeText = `${totalMinutes} MINUTE${totalMinutes === 1 ? "" : "S"}`;
-      }
-
-      showAlert(`${timeText} TO ${event}`);
-    }
-  }
-
-  updateCountdown();
-  const timer = setInterval(updateCountdown, 1000);
+  update();
+  setInterval(update,1000);
 }
 
 </script>
