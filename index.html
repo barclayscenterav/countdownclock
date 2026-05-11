@@ -74,21 +74,23 @@ h1{
   margin-bottom:10px;
 }
 
-/* bottom time display */
+/* bottom clock */
 #timeOfDay{
   position:fixed;
   bottom:25px;
   left:50%;
   transform:translateX(-50%);
-
   font-size:1.8rem;
   font-weight:800;
-  letter-spacing:2px;
-  color:#ffffff;
-
+  color:#fff;
   z-index:2;
   text-transform:uppercase;
-  text-align:center;
+  display:flex;
+  justify-content:center;
+}
+
+#timeOfDay span{
+  white-space:nowrap;
 }
 
 .time-dot{
